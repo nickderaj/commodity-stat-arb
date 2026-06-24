@@ -1,0 +1,27 @@
+
+============================================================
+Ingesting: Brent Calendar Spread (M1-M2)
+============================================================
+  Leg: BZ (provider=databento, exchange=CME)
+    Already up to date through 2026-06-23, skipping
+  Leg: BZ (provider=databento, exchange=CME)
+    Already up to date through 2026-06-23, skipping
+
+============================================================
+Ingesting: Brent-WTI Cross-Market Spread
+============================================================
+  Leg: BZ=F (provider=yfinance, exchange=ICE)
+    Already up to date through 2026-06-23, skipping
+  Leg: CL=F (provider=yfinance, exchange=CME)
+    Already up to date through 2026-06-23, skipping
+
+============================================================
+Ingesting: WTI Calendar Spread (M1-M2)
+============================================================
+  Leg: CL (provider=databento, exchange=CME)
+    Adjusting start 2018-01-01 → 2018-01-02 (dataset GLBX.MDP3 availability floor)
+    Wrote 74026 bars across 152 contracts
+  Leg: CL (provider=databento, exchange=CME)
+    Already up to date through 2026-06-23, skipping
+
+Ingestion complete.

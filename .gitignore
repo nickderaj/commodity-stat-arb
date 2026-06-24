@@ -1,0 +1,47 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+env/
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb_checkpoints
+
+# macOS
+.DS_Store
+.AppleDouble
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Data / outputs
+data/raw/
+data/cache/
+*.parquet
+*.csv
+*.pkl
+
+# Postgres volume (docker)
+postgres_data/
+
+# Alembic
+# (keep alembic/ in git — only exclude generated migration artefacts)
+
+# pytest
+.pytest_cache/
+.coverage
+htmlcov/

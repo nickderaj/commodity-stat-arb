@@ -1,0 +1,19 @@
+name: wti_calendar
+display_name: WTI Calendar Spread (M1-M2)
+spread_type: calendar
+legs:
+  - ticker: CL
+    provider: databento
+    exchange: CME
+    month_offset: 0
+  - ticker: CL
+    provider: databento
+    exchange: CME
+    month_offset: 1
+weights: [1.0, -1.0]
+economic_tether: >
+  Cost-of-carry arbitrage: physical storage + financing pin the M1-M2 spread.
+  Roll pressure from index funds (Goldman Roll) is a recurring, calendar-predictable shock.
+expected_half_life_days: 10
+roll_offset_days: 5
+roll_mode: calendar

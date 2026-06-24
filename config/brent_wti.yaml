@@ -1,0 +1,21 @@
+name: brent_wti
+display_name: Brent-WTI Cross-Market Spread
+spread_type: cross_market
+legs:
+  - ticker: BZ=F
+    provider: yfinance
+    exchange: ICE
+    month_offset: 0
+  - ticker: CL=F
+    provider: yfinance
+    exchange: CME
+    month_offset: 0
+weights: [1.0, -1.0]
+economic_tether: >
+  Brent and WTI are close substitutes for refiners. Location/quality differential
+  (North Sea waterborne vs Cushing landlocked) is bounded by pipeline capacity and
+  trade-flow economics. Regime-aware z-score required due to structural break risk
+  (2011 Cushing glut, 2015 US export ban repeal).
+expected_half_life_days: 15
+roll_offset_days: 5
+roll_mode: calendar

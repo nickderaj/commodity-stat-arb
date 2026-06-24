@@ -1,0 +1,20 @@
+name: brent_calendar
+display_name: Brent Calendar Spread (M1-M2)
+spread_type: calendar
+legs:
+  - ticker: BZ
+    provider: databento
+    exchange: CME
+    month_offset: 0
+  - ticker: BZ
+    provider: databento
+    exchange: CME
+    month_offset: 1
+weights: [1.0, -1.0]
+economic_tether: >
+  Same cost-of-carry tether as WTI calendar but priced on waterborne North Sea crude.
+  Uses NYMEX Brent (BZ on GLBX.MDP3), cash-settled against ICE Brent — tracks closely.
+  Brent carries a global supply-risk premium vs WTI.
+expected_half_life_days: 10
+roll_offset_days: 5
+roll_mode: calendar
