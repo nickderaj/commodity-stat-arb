@@ -78,7 +78,7 @@ The signal only fires reliably in backwardation regime (Brent Sharpe 0.322 vs 0.
 
 ### Signal logic and parameter choice
 
-60-day lookback (aligns with the ~7-day mean half-life × 5-10x heuristic = 35-70d). Entry threshold of 2.0 is more conservative than for brent_wti (1.5) because the calendar spread has a shorter half-life (7.1d vs 4.9-10.7d) and more false signals in roll windows. Higher threshold filters out the noisy roll-window moves.
+60-day lookback (aligns with the ~7-day mean half-life x 5-10x heuristic = 35-70d). Entry threshold of 2.0 is more conservative than for brent_wti (1.5) because the calendar spread has a shorter half-life (7.1d vs 4.9-10.7d) and more false signals in roll windows. Higher threshold filters out the noisy roll-window moves.
 
 Exit at |z| < 0.75 is looser than brent_wti (0.5), appropriate given the faster mean reversion - trades exit quickly anyway.
 

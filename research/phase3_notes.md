@@ -36,7 +36,7 @@ Both crude benchmarks have spent most of 2018-2026 in backwardation (prompt prem
 
 ### Carry Fair-Value Model
 
-Carry FV = -(storage + financing), where storage ~$0.45/bbl/month and financing ~5% × M2_price/12.
+Carry FV = -(storage + financing), where storage ~$0.45/bbl/month and financing ~5% x M2_price/12.
 
 | Spread         | Mean carry FV | Raw spread HL | Excess spread HL | Excess ADF p |
 | -------------- | ------------- | ------------- | ---------------- | ------------ |

@@ -25,7 +25,7 @@ The main reason for this spread in commodities is the cost-of-carry. The relatio
 The fair spread can be calculated by the following:
 
 $$
-F(T_2) ≈ F(T_1) × (1 + r·Δt) + storage·Δt − convenience_yield·Δt
+F(T_2) ≈ F(T_1) x (1 + r·Δt) + storage·Δt − convenience_yield·Δt
 $$
 
 - _r (financing)_: carrying a long futures position has an implicit finaancing cost
@@ -132,4 +132,4 @@ The strategy filters (vol, liquidity, roll-window & cointegration-health) exist 
 3. **Stationarity of the spread:** ADF + KPSS on the β-weighted spread.
 4. **Half-life of mean reversion:** AR(1) regression; keep pairs with half-life in a tradeable band (~3–30 days).
 5. **Stability:** rolling ADF / rolling co-integration to confirm the relationship isn't a single-period artefact; flag structural breaks.
-6. **Rank & report:** a scorecard table (one row per pair), sorted by a composite score (cointegration confidence × half-life suitability × stability). Top pairs run through the full engine.
+6. **Rank & report:** a scorecard table (one row per pair), sorted by a composite score (cointegration confidence x half-life suitability x stability). Top pairs run through the full engine.

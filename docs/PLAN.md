@@ -144,7 +144,7 @@ This phase turns "is this pair tradeable?" into a repeatable, ranked report, so 
   4. **Half-life** - AR(1) regression; keep pairs in the ~3–30 day tradeable band
   5. **Stability** - rolling ADF / rolling cointegration to confirm it's not a single-period artefact; flag structural breaks
 - [x] Run the screener over the drafted universe (Brent–WTI, gold–silver ratio, crack spread, crush spread, gold–platinum, platinum–palladium, corn–wheat, **copper–silver as a control you expect to fail**, etc.)
-- [x] Emit `research/screening_report.md`: one row per pair with correlation, coint p-value, β, ADF/KPSS, half-life, stability, and a composite score = coint confidence × half-life suitability × stability
+- [x] Emit `research/screening_report.md`: one row per pair with correlation, coint p-value, β, ADF/KPSS, half-life, stability, and a composite score = coint confidence x half-life suitability x stability
 - [x] Promote the top-scoring pairs to `SpreadDefinition` configs; these feed the same downstream engine unchanged
 
 ### ✅ Phase 2.5 Verification
@@ -172,7 +172,7 @@ This phase turns "is this pair tradeable?" into a repeatable, ranked report, so 
   - Roll-window filter: suppress new entries during roll window if realised vol is above 75th percentile
   - Volatility regime filter: compute 20-day vol percentile; suppress if above 90th percentile
   - Liquidity filter: suppress if volume is below rolling 10th percentile
-- [x] Run initial parameter scan: all three spreads × all entry/exit threshold combos × all lookback windows × regime filters on/off
+- [x] Run initial parameter scan: all three spreads x all entry/exit threshold combos x all lookback windows x regime filters on/off
 - [x] Produce a 3D heatmap (or 2D grid) of Sharpe vs. (entry threshold, lookback); identify top 3 signal candidates
 - [x] Write a hypothesis card for each candidate in `research/hypotheses.md`:
   - Inefficiency being exploited
@@ -245,16 +245,16 @@ Before proceeding to Phase 5, confirm all of the following:
 
 **Focus: Build**
 
-- [ ] Build `backtest/cost_model.py` with a `CostModel` class - all parameters configurable:
-  - Commission per contract (flat fee)
-  - Bid-ask spread cost (HL-range proxy as fraction of price)
+- [x] Build `backtest/cost_model.py` with a `CostModel` class - all parameters configurable:
+  - Commission per contract (flat fee; lot-size-aware: $2/contract, 1000-bbl lots)
+  - Bid-ask spread cost (fixed bps of spread price, overridable by HL-range proxy)
   - Preliminary slippage (fixed bps as a fallback before AC model is wired)
-- [ ] Implement position sizing in `backtest/sizing.py`:
-  - Fixed fractional: fixed % of equity at risk per trade
-  - ATR-based sizing: position size scales inversely with ATR
-  - Include margin/leverage constraints (max leverage cap)
-- [ ] Run full backtest across all spread candidates × 2 sizing methods; store each run in `backtest_runs` table with all params hashed for reproducibility
-- [ ] Compute and store standard performance metrics per run:
+- [x] Implement position sizing in `backtest/sizing.py`:
+  - Fixed fractional: fixed % of equity at risk per trade (risk_pct=1%)
+  - ATR-based sizing: position size scales inversely with ATR (rolling std of spread)
+  - Include margin/leverage constraints (max leverage cap = 5x)
+- [x] Run full backtest across all spread candidates x 2 sizing methods; store each run in `backtest_runs` table with all params hashed for reproducibility
+- [x] Compute and store standard performance metrics per run:
   - Sharpe ratio, Sortino ratio, Calmar ratio
   - Max drawdown (absolute and as % of peak equity)
   - Win rate, profit factor, average trade duration
@@ -266,11 +266,11 @@ Before proceeding to Phase 5, confirm all of the following:
 
 Before proceeding to Phase 6, confirm all of the following:
 
-- [ ] `CostModel` reduces net PnL meaningfully vs. zero-cost run (if costs have no effect, something is wrong)
-- [ ] All backtest runs stored in `backtest_runs` table; re-running with same param hash produces identical results
-- [ ] At least one spread/sizing combination shows Sharpe > 0.8 after costs (if none, revisit signal or cost assumptions)
-- [ ] Performance metrics table printed and cross-checked manually for at least one run
-- [ ] Position sizes are reasonable: no single trade risks more than 2–3% of equity
+- [x] `CostModel` reduces net PnL meaningfully vs. zero-cost run — confirmed: -7.1% (WTI cal), -3.8% (Brent cal), -2.6% (Brent–WTI)
+- [x] All backtest runs stored in `backtest_runs` table; re-running with same param hash produces identical results (idempotency verified: "already exists" message on re-run)
+- [~] At least one spread/sizing combination shows Sharpe > 0.8 after costs — **FLAG: best observed is 0.412 (Brent–WTI, entry=2.0, lookback=60)**. Strategy is profitable with positive Sharpe and 73% win rate / 6.4x profit factor, but does not reach 0.8. Cost model is correctly calibrated; alpha is moderate on daily bars. Phase 6 AC model will provide a more precise cost picture.
+- [x] Performance metrics table printed and cross-checked manually for at least one run
+- [x] Position sizes are reasonable: risk_pct=1% by design → max risk ≈ $1k per trade on $100k capital (well within 2–3%)
 
 ---
 
@@ -545,9 +545,9 @@ Use this as your top-level tracker. Each item maps to a phase above.
 - [x] Bar-level event-driven engine built
 - [x] Strategy base class and top candidate implemented
 - [x] Portfolio class with full audit logging
-- [ ] CostModel with commission, spread, slippage
-- [ ] ATR and fixed-fractional position sizing
-- [ ] Full parameter sweep complete; results stored in DB
+- [x] CostModel with commission, spread, slippage
+- [x] ATR and fixed-fractional position sizing
+- [x] Full parameter sweep complete; results stored in DB
 
 ### Execution
 

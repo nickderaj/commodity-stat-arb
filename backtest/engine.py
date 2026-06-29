@@ -34,7 +34,9 @@ import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
+from backtest.cost_model import CostModel
 from backtest.portfolio import Portfolio, Trade
+from backtest.sizing import ATRSizing, FixedFractionalSizing, SizingModel, compute_atr_series
 from backtest.strategy import Strategy, ZScoreStrategy
 from db.models import BacktestRun, Order
 from db.session import get_session
@@ -51,6 +53,12 @@ class BacktestEngine:
         Which spread to run (must exist in the ``spreads`` DB table).
     initial_capital : float
         Starting portfolio equity (used for Calmar/max-DD normalisation).
+    cost_model : CostModel, optional
+        Transaction cost model. If None, all fills are zero-cost.
+    sizing_model : SizingModel, optional
+        Position sizing model. If None, trades are unit-size (1 contract).
+    atr_window : int
+        Rolling window for ATR (spread rolling std) used by sizing models.
     """
 
     def __init__(
@@ -58,10 +66,16 @@ class BacktestEngine:
         strategy: Strategy,
         spread_name: str,
         initial_capital: float = 100_000.0,
+        cost_model: Optional[CostModel] = None,
+        sizing_model: Optional[SizingModel] = None,
+        atr_window: int = 14,
     ) -> None:
         self.strategy = strategy
         self.spread_name = spread_name
         self.initial_capital = initial_capital
+        self.cost_model = cost_model
+        self.sizing_model = sizing_model
+        self.atr_window = atr_window
         self.portfolio = Portfolio(initial_capital)
 
     # ------------------------------------------------------------------
@@ -100,6 +114,9 @@ class BacktestEngine:
         actual_start = df.index[0].date()
         actual_end = df.index[-1].date()
 
+        # Pre-compute ATR series for position sizing (shifted; no look-ahead)
+        atr_series = compute_atr_series(df["value"], window=self.atr_window)
+
         # ------------------------------------------------------------------
         # Bar-by-bar event loop
         # ------------------------------------------------------------------
@@ -108,7 +125,7 @@ class BacktestEngine:
             spread_value: float = float(df["value"].iloc[i])
 
             if np.isnan(spread_value):
-                self.portfolio.mark_to_market(bar_date, spread_value if not np.isnan(spread_value) else (self.portfolio.entry_price or 0.0))
+                self.portfolio.mark_to_market(bar_date, self.portfolio.entry_price or 0.0)
                 continue
 
             desired = self.strategy.on_bar(i, self.portfolio.position)
@@ -117,17 +134,35 @@ class BacktestEngine:
             current = self.portfolio.position
 
             if current != 0 and desired == 0:
-                # Exit: close the open position at this bar's spread value
-                self.portfolio.on_exit(bar_date, spread_value)
+                # Exit: compute costs and close position
+                costs = self._compute_costs(
+                    entry_price=self.portfolio.entry_price,
+                    exit_price=spread_value,
+                    quantity=self.portfolio.entry_quantity,
+                )
+                self.portfolio.on_exit(
+                    bar_date,
+                    spread_value,
+                    fees=costs.commission,
+                    slippage=costs.slippage,
+                    spread_cost=costs.spread_cost,
+                )
 
             elif current == 0 and desired in (-1, 1):
-                # Entry: open a new position
+                # Entry: determine position size then open
+                atr = float(atr_series.iloc[i]) if not np.isnan(atr_series.iloc[i]) else 1.0
+                quantity = self._compute_size(
+                    equity=self.portfolio.cash,
+                    spread_price=spread_value,
+                    atr=atr,
+                )
                 self.portfolio.on_entry(
                     bar_date,
                     spread_value,
                     desired,
                     zscore=meta.get("zscore") or float("nan"),
                     regime=meta.get("regime", ""),
+                    quantity=quantity,
                 )
 
             # Mark portfolio to market at bar close
@@ -137,7 +172,18 @@ class BacktestEngine:
         if self.portfolio.position != 0:
             last_date = df.index[-1].date()
             last_price = float(df["value"].iloc[-1])
-            self.portfolio.on_exit(last_date, last_price)
+            costs = self._compute_costs(
+                entry_price=self.portfolio.entry_price,
+                exit_price=last_price,
+                quantity=self.portfolio.entry_quantity,
+            )
+            self.portfolio.on_exit(
+                last_date,
+                last_price,
+                fees=costs.commission,
+                slippage=costs.slippage,
+                spread_cost=costs.spread_cost,
+            )
 
         # ------------------------------------------------------------------
         # Collect results
@@ -149,6 +195,8 @@ class BacktestEngine:
             "end_date": str(actual_end),
             "initial_capital": self.initial_capital,
             **self.strategy.params,
+            **(self.cost_model.as_dict() if self.cost_model else {"cost_model": "none"}),
+            **(self.sizing_model.as_dict() if self.sizing_model else {"sizing": "unit"}),
         }
         params_hash = _hash_params(params)
 
@@ -168,6 +216,27 @@ class BacktestEngine:
             results["run_id"] = run_id
 
         return results
+
+    # ------------------------------------------------------------------
+    # Cost and sizing helpers
+    # ------------------------------------------------------------------
+
+    def _compute_costs(self, entry_price, exit_price, quantity: int):
+        """Delegate to CostModel; returns zero-cost breakdown when no model configured."""
+        from backtest.cost_model import CostBreakdown
+        if self.cost_model is None:
+            return CostBreakdown(commission=0.0, spread_cost=0.0, slippage=0.0)
+        return self.cost_model.compute(
+            entry_price=entry_price or 0.0,
+            exit_price=exit_price,
+            quantity=quantity,
+        )
+
+    def _compute_size(self, equity: float, spread_price: float, atr: float) -> int:
+        """Delegate to SizingModel; returns 1 when no model configured."""
+        if self.sizing_model is None:
+            return 1
+        return self.sizing_model.compute_size(equity=equity, spread_price=spread_price, atr=atr)
 
     # ------------------------------------------------------------------
     # DB persistence
@@ -232,7 +301,7 @@ class BacktestEngine:
         print(f"Period  : {m['start_date']} → {m['end_date']}")
         print(f"{'='*60}")
         print(f"  Trades          : {m['total_trades']}")
-        print(f"  Realised PnL    : ${m['realised_pnl']:.2f}/bbl")
+        print(f"  Realised PnL    : ${m['realised_pnl']:.2f}")
         print(f"  Sharpe          : {_fmt(m['sharpe'])}")
         print(f"  Sortino         : {_fmt(m['sortino'])}")
         print(f"  Calmar          : {_fmt(m['calmar'])}")
@@ -269,6 +338,7 @@ def _trade_to_order(trade: Trade, spread_name: str, run_id: int) -> Order:
         entry_date=trade.entry_date,
         exit_date=trade.exit_date,
         direction="long" if trade.direction == 1 else "short",
+        quantity=trade.quantity,
         entry_price=trade.entry_price,
         exit_price=trade.exit_price,
         fill_price=trade.fill_price,

@@ -25,6 +25,7 @@ class Trade:
     zscore_at_entry: float
     regime_at_entry: str
     pnl: float              # net PnL after costs
+    quantity: int = 1       # number of units/contracts traded
     fees: float = 0.0
     slippage: float = 0.0
     spread_cost: float = 0.0
@@ -51,6 +52,7 @@ class Portfolio:
         self.entry_date: Optional[date] = None
         self.entry_zscore: Optional[float] = None
         self.entry_regime: str = ""
+        self.entry_quantity: int = 1
         self.realised_pnl: float = 0.0
         self._equity_curve: list[tuple[date, float]] = []
         self.trades: list[Trade] = []
@@ -66,6 +68,7 @@ class Portfolio:
         direction: int,
         zscore: float = float("nan"),
         regime: str = "",
+        quantity: int = 1,
     ) -> None:
         if self.position != 0:
             raise RuntimeError("Cannot enter when already in position")
@@ -76,6 +79,7 @@ class Portfolio:
         self.entry_date = bar_date
         self.entry_zscore = zscore
         self.entry_regime = regime
+        self.entry_quantity = max(1, int(quantity))
 
     def on_exit(
         self,
@@ -89,7 +93,7 @@ class Portfolio:
     ) -> Trade:
         if self.position == 0:
             raise RuntimeError("Cannot exit when flat")
-        raw_pnl = (price - self.entry_price) * self.position
+        raw_pnl = (price - self.entry_price) * self.position * self.entry_quantity
         total_cost = fees + slippage + spread_cost + temp_impact_cost + perm_impact_cost
         net_pnl = raw_pnl - total_cost
         self.realised_pnl += net_pnl
@@ -105,6 +109,7 @@ class Portfolio:
             zscore_at_entry=self.entry_zscore if self.entry_zscore is not None else float("nan"),
             regime_at_entry=self.entry_regime,
             pnl=net_pnl,
+            quantity=self.entry_quantity,
             fees=fees,
             slippage=slippage,
             spread_cost=spread_cost,
@@ -118,6 +123,7 @@ class Portfolio:
         self.entry_date = None
         self.entry_zscore = None
         self.entry_regime = ""
+        self.entry_quantity = 1
 
         return trade
 
@@ -125,7 +131,7 @@ class Portfolio:
         """Record equity snapshot; returns current equity (cash + unrealised PnL)."""
         unrealised = 0.0
         if self.position != 0 and self.entry_price is not None:
-            unrealised = (price - self.entry_price) * self.position
+            unrealised = (price - self.entry_price) * self.position * self.entry_quantity
         equity = self.cash + unrealised
         self._equity_curve.append((bar_date, equity))
         return equity

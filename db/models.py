@@ -133,6 +133,7 @@ class Order(Base):
     entry_date = Column(Date, nullable=False)
     exit_date = Column(Date)
     direction = Column(String(5), nullable=False)  # "long" | "short"
+    quantity = Column(Integer, default=1)
     entry_price = Column(Float)
     exit_price = Column(Float)
     fill_price = Column(Float)

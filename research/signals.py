@@ -161,7 +161,7 @@ def run_backtest(
       - Exit when |z| < exit_thresh
       - suppress (boolean Series): blocks NEW entries on that bar
 
-    PnL at bar t = position[t-1] × (spread[t] - spread[t-1])
+    PnL at bar t = position[t-1] x (spread[t] - spread[t-1])
     No costs (Phase 5 concern).
     """
     n = len(zscore)
@@ -193,7 +193,7 @@ def run_backtest(
 
     pos_s = pd.Series(position, index=spread.index)
     daily_change = spread.diff()
-    # pnl[t] = position held at end of t-1 × change from t-1 to t
+    # pnl[t] = position held at end of t-1 x change from t-1 to t
     pnl = pos_s.shift(1) * daily_change
 
     pnl_clean = pnl.dropna()
@@ -256,7 +256,7 @@ def param_scan(
 # ---------------------------------------------------------------------------
 
 def plot_heatmaps(scan_df: pd.DataFrame, spread_name: str) -> None:
-    """2D Sharpe heatmap: entry_threshold × lookback, best exit_thresh per cell.
+    """2D Sharpe heatmap: entry_threshold x lookback, best exit_thresh per cell.
 
     Two panels: filters off (left) and filters on (right).
     """
