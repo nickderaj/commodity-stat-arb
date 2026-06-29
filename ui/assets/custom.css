@@ -1,0 +1,206 @@
+/* ── Dash Dropdown (Dash 2.x uses .dash-dropdown-* classes) ─────────────── */
+
+/* The selected value text - Dash 2.x specific */
+.dash-dropdown-value,
+.dash-dropdown-value > * {
+    color: #e0e0f0 !important;
+}
+
+/* React-Select inner elements (still present in Dash 2.x) */
+.Select-control {
+    background-color: #1e2a45 !important;
+    border-color: #2a2a4a !important;
+}
+.Select-value-label,
+.Select--single > .Select-control .Select-value,
+.VirtualizedSelectOption {
+    color: #e0e0f0 !important;
+}
+.Select-placeholder {
+    color: #888 !important;
+}
+.Select-input > input {
+    color: #e0e0f0 !important;
+    background-color: transparent !important;
+}
+.Select-menu-outer {
+    background-color: #1e2a45 !important;
+    border-color: #2a2a4a !important;
+    z-index: 9999 !important;
+}
+.Select-option {
+    background-color: #1e2a45 !important;
+    color: #e0e0f0 !important;
+}
+.Select-option:hover,
+.Select-option.is-focused {
+    background-color: #2a2a4a !important;
+    color: #4cc9f0 !important;
+}
+.Select-arrow-zone .Select-arrow {
+    border-top-color: #888 !important;
+}
+
+/* Dash 2.x dropdown container */
+.dash-dropdown .Select-control,
+.dash-dropdown .Select-menu-outer {
+    background-color: #1e2a45 !important;
+    border-color: #2a2a4a !important;
+}
+
+/* ── Date Picker (react-dates / Airbnb) ─────────────────────────────────── */
+.DateRangePickerInput {
+    background-color: #1e2a45 !important;
+    border-color: #2a2a4a !important;
+    border-radius: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+.DateRangePickerInput__withBorder {
+    border-color: #2a2a4a !important;
+}
+.DateInput {
+    background: transparent !important;
+}
+.DateInput_input {
+    background-color: #1e2a45 !important;
+    color: #e0e0f0 !important;
+    font-size: 0.72rem !important;
+    padding: 4px 6px !important;
+    border-bottom: none !important;
+}
+.DateInput_input::placeholder {
+    color: #888 !important;
+}
+.DateRangePickerInput_arrow {
+    color: #888 !important;
+}
+.DateRangePicker_picker {
+    background-color: #16213e !important;
+    z-index: 9999 !important;
+}
+.DayPicker {
+    background-color: #16213e !important;
+}
+.CalendarMonth {
+    background-color: #16213e !important;
+}
+.CalendarMonth_caption {
+    color: #e0e0f0 !important;
+}
+.CalendarDay__default {
+    background-color: #16213e !important;
+    color: #e0e0f0 !important;
+    border-color: #2a2a4a !important;
+}
+.CalendarDay__default:hover {
+    background-color: #2a2a4a !important;
+}
+.CalendarDay__selected,
+.CalendarDay__selected:hover {
+    background-color: #4cc9f0 !important;
+    border-color: #4cc9f0 !important;
+    color: #1a1a2e !important;
+}
+.CalendarDay__selected_span {
+    background-color: rgba(76,201,240,0.2) !important;
+    color: #e0e0f0 !important;
+    border-color: #2a2a4a !important;
+}
+.DayPickerNavigation_button {
+    border-color: #2a2a4a !important;
+    background-color: #1e2a45 !important;
+}
+.DayPickerNavigation_svg__horizontal {
+    fill: #e0e0f0 !important;
+}
+.DayPicker_weekHeader_li small {
+    color: #888 !important;
+}
+
+/* ── Slider marks and internal number input ──────────────────────────────── */
+.rc-slider-mark-text {
+    color: #aaa !important;
+    font-size: 0.7rem !important;
+}
+.rc-slider-rail {
+    background-color: #2a2a4a !important;
+}
+.rc-slider-track {
+    background-color: #4cc9f0 !important;
+}
+.rc-slider-handle {
+    border-color: #4cc9f0 !important;
+    background-color: #4cc9f0 !important;
+}
+.rc-slider-dot {
+    border-color: #2a2a4a !important;
+    background-color: #2a2a4a !important;
+}
+.rc-slider-dot-active {
+    border-color: #4cc9f0 !important;
+}
+
+/* Slider tooltip / number input that Dash injects with inline color: black */
+.dash-slider input[type="number"],
+.dash-slider-container input,
+input.rc-slider-tooltip-inner {
+    color: #e0e0f0 !important;
+    background-color: #1e2a45 !important;
+    border-color: #2a2a4a !important;
+}
+
+/* Dash NumericInput used inside sliders (shown on hover/focus) */
+.NumberInput input,
+.VueSlider-tooltip,
+.rc-slider-tooltip-inner {
+    color: #e0e0f0 !important;
+    background-color: #1e2a45 !important;
+    border-color: #2a2a4a !important;
+}
+
+/* Catch-all: any input inside a dash-slider wrapper */
+[class*="dash-slider"] input {
+    color: #e0e0f0 !important;
+    background-color: #1e2a45 !important;
+}
+
+/* ── Tooltip (info icon hover) ───────────────────────────────────────────── */
+.info-icon {
+    color: #4cc9f0;
+    cursor: help;
+    font-size: 0.75rem;
+    margin-left: 5px;
+    border: 1px solid #4cc9f0;
+    border-radius: 50%;
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    line-height: 13px;
+    text-align: center;
+    font-weight: bold;
+    opacity: 0.8;
+    vertical-align: middle;
+}
+.info-icon:hover {
+    opacity: 1;
+}
+
+/* ── General dark overrides ──────────────────────────────────────────────── */
+.tooltip-inner {
+    background-color: #1e2a45 !important;
+    color: #e0e0f0 !important;
+    font-size: 0.75rem !important;
+    max-width: 240px !important;
+    text-align: left !important;
+    border: 1px solid #2a2a4a !important;
+}
+.tooltip.show {
+    opacity: 1 !important;
+}
+.bs-tooltip-end .tooltip-arrow::before {
+    border-right-color: #2a2a4a !important;
+}
+.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: #2a2a4a !important;
+}
