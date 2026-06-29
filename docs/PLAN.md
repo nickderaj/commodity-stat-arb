@@ -215,15 +215,15 @@ Before proceeding to Phase 4, confirm all of the following:
 
 **Focus: Build**
 
-- [ ] Build `backtest/engine.py`: bar-by-bar event loop over spread data
+- [x] Build `backtest/engine.py`: bar-by-bar event loop over spread data
   - Core loop: fetch next bar → check open positions → check new signal → generate order → apply fill logic → update portfolio state
-- [ ] Define `Strategy` base class with methods: `on_bar()`, `on_fill()`, `generate_signal()`
-- [ ] Implement top signal candidate as a `Strategy` subclass
-- [ ] Build `Portfolio` class: tracks positions, cash, realised PnL, unrealised PnL, max drawdown
-- [ ] All trades logged to Postgres `orders` table with full audit trail:
+- [x] Define `Strategy` base class with methods: `on_bar()`, `on_fill()`, `generate_signal()`
+- [x] Implement top signal candidate as a `Strategy` subclass
+- [x] Build `Portfolio` class: tracks positions, cash, realised PnL, unrealised PnL, max drawdown
+- [x] All trades logged to Postgres `orders` table with full audit trail:
   - Signal value at entry, z-score at entry, regime flags, fill price, fees, slippage, duration
-- [ ] Add look-ahead bias guard: assert that all rolling windows and signal computations use only data indexed at `[0:t]`, never `[t+1:]`
-- [ ] Smoke test: run engine on 1 year of data; confirm no NaN blowups, no negative cash, no zero-division errors
+- [x] Add look-ahead bias guard: assert that all rolling windows and signal computations use only data indexed at `[0:t]`, never `[t+1:]`
+- [x] Smoke test: run engine on 1 year of data; confirm no NaN blowups, no negative cash, no zero-division errors
 
 ---
 
@@ -231,11 +231,11 @@ Before proceeding to Phase 4, confirm all of the following:
 
 Before proceeding to Phase 5, confirm all of the following:
 
-- [ ] Engine runs end-to-end on 1 year of spread data without errors
-- [ ] All trades are written to the `orders` table with complete audit fields
-- [ ] Look-ahead bias check passes: manually inspect that signals at bar `t` only use data up to `t-1`
-- [ ] `Portfolio` correctly tracks PnL (compare a handful of trades manually)
-- [ ] Code is modular: `engine.py`, `strategy.py`, and `portfolio.py` are separate files with clear responsibilities
+- [x] Engine runs end-to-end on 1 year of spread data without errors
+- [x] All trades are written to the `orders` table with complete audit fields
+- [x] Look-ahead bias check passes: manually inspect that signals at bar `t` only use data up to `t-1`
+- [x] `Portfolio` correctly tracks PnL (compare a handful of trades manually)
+- [x] Code is modular: `engine.py`, `strategy.py`, and `portfolio.py` are separate files with clear responsibilities
 
 ---
 
@@ -542,9 +542,9 @@ Use this as your top-level tracker. Each item maps to a phase above.
 
 ### Backtest
 
-- [ ] Bar-level event-driven engine built
-- [ ] Strategy base class and top candidate implemented
-- [ ] Portfolio class with full audit logging
+- [x] Bar-level event-driven engine built
+- [x] Strategy base class and top candidate implemented
+- [x] Portfolio class with full audit logging
 - [ ] CostModel with commission, spread, slippage
 - [ ] ATR and fixed-fractional position sizing
 - [ ] Full parameter sweep complete; results stored in DB
