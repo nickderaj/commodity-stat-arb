@@ -164,17 +164,17 @@ This phase turns "is this pair tradeable?" into a repeatable, ranked report, so 
 
 ### Signal construction and parameter scan
 
-- [ ] Build `research/signals.py`: implement z-score mean-reversion signal on each spread
+- [x] Build `research/signals.py`: implement z-score mean-reversion signal on each spread
   - Entry condition: `|z| > threshold` (test 1.0, 1.5, 2.0)
   - Exit condition: `|z| < exit_threshold` (test 0.3, 0.5, 0.75)
   - Rolling lookback windows: 20, 30, 60 days
-- [ ] Add regime filters to `signals.py`:
+- [x] Add regime filters to `signals.py`:
   - Roll-window filter: suppress new entries during roll window if realised vol is above 75th percentile
   - Volatility regime filter: compute 20-day vol percentile; suppress if above 90th percentile
   - Liquidity filter: suppress if volume is below rolling 10th percentile
-- [ ] Run initial parameter scan: all three spreads × all entry/exit threshold combos × all lookback windows × regime filters on/off
-- [ ] Produce a 3D heatmap (or 2D grid) of Sharpe vs. (entry threshold, lookback); identify top 3 signal candidates
-- [ ] Write a hypothesis card for each candidate in `research/hypotheses.md`:
+- [x] Run initial parameter scan: all three spreads × all entry/exit threshold combos × all lookback windows × regime filters on/off
+- [x] Produce a 3D heatmap (or 2D grid) of Sharpe vs. (entry threshold, lookback); identify top 3 signal candidates
+- [x] Write a hypothesis card for each candidate in `research/hypotheses.md`:
   - Inefficiency being exploited
   - Signal logic and parameter choice
   - Expected half-life range
@@ -183,13 +183,13 @@ This phase turns "is this pair tradeable?" into a repeatable, ranked report, so 
 
 ### Term structure model and carry fair-value baseline
 
-- [ ] Build a carry/fair-value model for the calendar spread:
+- [x] Build a carry/fair-value model for the calendar spread:
   - Cost-of-carry baseline = storage cost proxy + financing cost
   - Model storage parametrically (e.g. $0.30–$0.60/bbl/month for WTI); do sensitivity analysis
-- [ ] Compute "excess spread" = observed calendar spread – carry fair value; test if excess spread mean-reverts faster than raw spread; compare ADF test stats and rolling half-lives
-- [ ] Plot the term structure curve (M1 through M6) for each month in history; characterise contango vs. backwardation regimes
-- [ ] Stratify backtest results by term structure regime (contango / backwardation); check whether signal performance differs meaningfully
-- [ ] Write a 1-page research summary of Phase 1–3 findings in `research/research_summary.md`:
+- [x] Compute "excess spread" = observed calendar spread – carry fair value; test if excess spread mean-reverts faster than raw spread; compare ADF test stats and rolling half-lives
+- [x] Plot the term structure curve (M1 through M6) for each month in history; characterise contango vs. backwardation regimes
+- [x] Stratify backtest results by term structure regime (contango / backwardation); check whether signal performance differs meaningfully
+- [x] Write a 1-page research summary of Phase 1–3 findings in `research/research_summary.md`:
   - Key statistics (half-lives, ADF p-values, regime splits)
   - Top 2 signal candidates with rationale
   - Outstanding questions for later phases
@@ -200,12 +200,12 @@ This phase turns "is this pair tradeable?" into a repeatable, ranked report, so 
 
 Before proceeding to Phase 4, confirm all of the following:
 
-- [ ] `signals.py` runs without errors across all parameter combinations
-- [ ] Parameter scan heatmap produced; at least one "ridge" of good Sharpe is visible (not a single lucky point)
-- [ ] Hypothesis cards written for top 3 candidates in `hypotheses.md`
-- [ ] Carry fair-value model implemented; excess spread stationarity compared to raw spread
-- [ ] Term structure regime labels computed and stored in `spreads` table
-- [ ] `research_summary.md` written and top 2 signal candidates selected for backtesting
+- [x] `signals.py` runs without errors across all parameter combinations
+- [x] Parameter scan heatmap produced; at least one "ridge" of good Sharpe is visible (not a single lucky point)
+- [x] Hypothesis cards written for top 3 candidates in `hypotheses.md`
+- [x] Carry fair-value model implemented; excess spread stationarity compared to raw spread
+- [x] Term structure regime labels computed and stored in `spreads` table
+- [x] `research_summary.md` written and top 2 signal candidates selected for backtesting
 
 ---
 
@@ -531,14 +531,14 @@ Use this as your top-level tracker. Each item maps to a phase above.
 
 ### Research
 
-- [ ] Roll-window microstructure diagnostics complete
+- [x] Roll-window microstructure diagnostics complete
 - [x] Pair screener built; `screening_report.md` ranks the universe; ≥1 economically-grounded pair beyond Brent–WTI passes (Phase 2.5)
-- [ ] ADF/KPSS/Engle-Granger tests run and documented
-- [ ] Rolling half-life chart produced
-- [ ] Structural breaks identified
-- [ ] Carry fair-value model built and tested
-- [ ] Term structure regime labels applied
-- [ ] Top 2 signal candidates selected with hypothesis cards written
+- [x] ADF/KPSS/Engle-Granger tests run and documented
+- [x] Rolling half-life chart produced
+- [x] Structural breaks identified
+- [x] Carry fair-value model built and tested
+- [x] Term structure regime labels applied
+- [x] Top 2 signal candidates selected with hypothesis cards written
 
 ### Backtest
 

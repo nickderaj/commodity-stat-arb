@@ -86,7 +86,8 @@ class Spread(Base):
     leg2_price = Column(Float)
     hedge_ratio = Column(Float, default=1.0)
     roll_window_flag = Column(Boolean, default=False)
-    regime = Column(String(20))  # "roll_window" | "mid_cycle" | None
+    regime = Column(String(20))       # "roll_window" | "mid_cycle"
+    ts_regime = Column(String(20))    # "contango" | "backwardation" (calendar spreads)
 
     __table_args__ = (UniqueConstraint("spread_name", "date", name="uq_spread_name_date"),)
 
