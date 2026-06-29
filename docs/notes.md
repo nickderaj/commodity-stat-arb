@@ -1,6 +1,6 @@
 # Brent-WTI Mean Reversion
 
-## _ These are my rough notes _
+## _ These are my rough notes before running any of the research _
 
 > We are trading the statistical relative value (stat-arb): two (or more) instruments are tied together by an economic relationship, therefore their price difference (spread) is mean-reverting
 

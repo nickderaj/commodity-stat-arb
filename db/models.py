@@ -32,6 +32,7 @@ class Contract(Base):
     last_trade_date = Column(Date)
 
     bars = relationship("OHLCVBar", back_populates="contract", cascade="all, delete-orphan")
+    metrics = relationship("ContractMetrics", back_populates="contract", cascade="all, delete-orphan")
 
     __table_args__ = (UniqueConstraint("ticker", name="uq_contracts_ticker"),)
 
@@ -52,6 +53,26 @@ class OHLCVBar(Base):
     contract = relationship("Contract", back_populates="bars")
 
     __table_args__ = (UniqueConstraint("contract_id", "date", name="uq_ohlcv_contract_date"),)
+
+
+class ContractMetrics(Base):
+    """Daily microstructure proxies derived from OHLCV (not true tick-level microstructure)."""
+
+    __tablename__ = "contract_metrics"
+
+    id = Column(BigInteger, primary_key=True)
+    contract_id = Column(Integer, ForeignKey("contracts.id"), nullable=False)
+    date = Column(Date, nullable=False)
+    realised_vol_20d = Column(Float)   # annualised std of 20-day log returns
+    hl_range_pct = Column(Float)       # (high - low) / close - bid-ask spread proxy
+    avg_volume_20d = Column(Float)     # 20-day rolling mean volume
+    avg_oi_20d = Column(Float)         # 20-day rolling mean open interest
+
+    contract = relationship("Contract", back_populates="metrics")
+
+    __table_args__ = (
+        UniqueConstraint("contract_id", "date", name="uq_contract_metrics_contract_date"),
+    )
 
 
 class Spread(Base):

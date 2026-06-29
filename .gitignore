@@ -39,7 +39,7 @@ data/cache/
 postgres_data/
 
 # Alembic
-# (keep alembic/ in git — only exclude generated migration artefacts)
+# (keep alembic/ in git - only exclude generated migration artefacts)
 
 # pytest
 .pytest_cache/

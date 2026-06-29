@@ -81,7 +81,7 @@ def _upsert_bars(session, contract_id: int, df: pd.DataFrame) -> int:
     if df.empty:
         return 0
     df = df[df["close"].notna()]
-    # Deduplicate by date — yfinance occasionally returns duplicate rows for the same
+    # Deduplicate by date - yfinance occasionally returns duplicate rows for the same
     # date, which causes Postgres to reject the whole batch with an ON CONFLICT error.
     df = df[~df.index.duplicated(keep="last")]
     if df.empty:
@@ -152,7 +152,7 @@ def ingest_spread(
             if fetch_start >= end:
                 print(f"    Already up to date through {latest}, skipping")
                 continue
-            print(f"    Have data to {latest} — fetching {fetch_start} → {end}")
+            print(f"    Have data to {latest} - fetching {fetch_start} → {end}")
         else:
             fetch_start = start
 
@@ -166,7 +166,7 @@ def ingest_spread(
                 )
             except Exception as exc:
                 print(f"    ERROR fetching {leg.ticker}: {exc}")
-                print(f"    Skipping leg — check dataset access at databento.com/pricing")
+                print(f"    Skipping leg - check dataset access at databento.com/pricing")
                 continue
 
             session = get_session()

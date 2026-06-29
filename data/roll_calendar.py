@@ -66,26 +66,26 @@ def _cme_holidays(start_year: int, end_year: int) -> list[str]:
     for year in range(start_year, end_year + 1):
         # New Year's Day
         holidays.append(_nearest_weekday(date(year, 1, 1)).isoformat())
-        # MLK Day — 3rd Monday of January
+        # MLK Day - 3rd Monday of January
         holidays.append(_nth_weekday_of_month(year, 1, 0, 3).isoformat())
-        # Presidents' Day — 3rd Monday of February
+        # Presidents' Day - 3rd Monday of February
         holidays.append(_nth_weekday_of_month(year, 2, 0, 3).isoformat())
-        # Good Friday — Easter - 2 days (CME futures are closed Good Friday for most products)
+        # Good Friday - Easter - 2 days (CME futures are closed Good Friday for most products)
         holidays.append((_easter(year) - timedelta(days=2)).isoformat())
-        # Memorial Day — last Monday of May
+        # Memorial Day - last Monday of May
         last_may = date(year, 5, 31)
         last_monday_may = last_may - timedelta(days=last_may.weekday())
         holidays.append(last_monday_may.isoformat())
-        # Juneteenth — June 19 (observed from 2022)
+        # Juneteenth - June 19 (observed from 2022)
         if year >= 2022:
             holidays.append(_nearest_weekday(date(year, 6, 19)).isoformat())
-        # Independence Day — July 4 (observed)
+        # Independence Day - July 4 (observed)
         holidays.append(_nearest_weekday(date(year, 7, 4)).isoformat())
-        # Labor Day — 1st Monday of September
+        # Labor Day - 1st Monday of September
         holidays.append(_nth_weekday_of_month(year, 9, 0, 1).isoformat())
-        # Thanksgiving — 4th Thursday of November
+        # Thanksgiving - 4th Thursday of November
         holidays.append(_nth_weekday_of_month(year, 11, 3, 4).isoformat())
-        # Christmas — Dec 25 (observed)
+        # Christmas - Dec 25 (observed)
         holidays.append(_nearest_weekday(date(year, 12, 25)).isoformat())
 
     return sorted(set(holidays))
@@ -271,5 +271,5 @@ if __name__ == "__main__":
         print(f"\n{prod} 2024:")
         print(df[df["contract_month"].str.startswith("2024")].to_string(index=False))
 
-    # Seed to DB — include both BZ (NYMEX mirror) and B (ICE Futures Europe)
+    # Seed to DB - include both BZ (NYMEX mirror) and B (ICE Futures Europe)
     seed_roll_calendar(products=["CL", "BZ", "B"])

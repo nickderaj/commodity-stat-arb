@@ -1,8 +1,8 @@
-# Project 1 — Commodities Microstructure Stat-Arb Engine
+# Project 1 - Commodities Microstructure Stat-Arb Engine
 
 ## Phased Build Plan
 
-> **Goal:** Build a **pair-agnostic** commodity futures stat-arb research and execution platform — proven first on Brent/WTI and crude calendar spreads, then extended to any cointegrated pair via a screening pipeline — with (stylized) microstructure diagnostics, an Almgren-Chriss execution simulation, and an interview-ready Plotly Dash dashboard.
+> **Goal:** Build a **pair-agnostic** commodity futures stat-arb research and execution platform - proven first on Brent/WTI and crude calendar spreads, then extended to any cointegrated pair via a screening pipeline - with (stylized) microstructure diagnostics, an Almgren-Chriss execution simulation, and an interview-ready Plotly Dash dashboard.
 >
 > **Design principle:** Every module operates on a generic `SpreadDefinition` config object, never a hardcoded ticker. Adding a commodity is a config entry + a screening pass, not a rewrite. See [`PHASE0_FINANCIAL_REASONING.md`](./PHASE0_FINANCIAL_REASONING.md) for the economic thesis behind every trade and the generalization framework.
 >
@@ -12,62 +12,62 @@
 
 ## Table of Contents
 
-1. [Phase 1 — Project Skeleton & Data Infrastructure](#phase-1)
-2. [Phase 2 — Microstructure Diagnostics & Statistical Tests](#phase-2)
-3. [Phase 2.5 — Pair Screening (cointegration universe)](#phase-2-5)
-4. [Phase 3 — Signal Design & Regime Filters](#phase-3)
-5. [Phase 4 — Backtest Engine Scaffold](#phase-4)
-6. [Phase 5 — Full Backtest with Costs](#phase-5)
-7. [Phase 6 — Almgren-Chriss Execution Simulator](#phase-6)
-8. [Phase 7 — Robustness Testing](#phase-7)
-9. [Phase 8 — Plotly Dash Dashboard](#phase-8)
-10. [Phase 9 — Research Memo & GitHub Polish](#phase-9)
-11. [Phase 10 — Interview Prep & Paper-Trade Scaffold](#phase-10)
-12. [CV Bullets — Ready to Use](#cv-bullets)
+1. [Phase 1 - Project Skeleton & Data Infrastructure](#phase-1)
+2. [Phase 2 - Microstructure Diagnostics & Statistical Tests](#phase-2)
+3. [Phase 2.5 - Pair Screening (cointegration universe)](#phase-2-5)
+4. [Phase 3 - Signal Design & Regime Filters](#phase-3)
+5. [Phase 4 - Backtest Engine Scaffold](#phase-4)
+6. [Phase 5 - Full Backtest with Costs](#phase-5)
+7. [Phase 6 - Almgren-Chriss Execution Simulator](#phase-6)
+8. [Phase 7 - Robustness Testing](#phase-7)
+9. [Phase 8 - Plotly Dash Dashboard](#phase-8)
+10. [Phase 9 - Research Memo & GitHub Polish](#phase-9)
+11. [Phase 10 - Interview Prep & Paper-Trade Scaffold](#phase-10)
+12. [CV Bullets - Ready to Use](#cv-bullets)
 13. [Master Completion Checklist](#master-checklist)
 
 ---
 
 <a name="phase-1"></a>
 
-## Phase 1 — Project Skeleton & Data Infrastructure
+## Phase 1 - Project Skeleton & Data Infrastructure
 
 **Focus: Data**
 
 ### Project skeleton, DB schema, ingestion pipeline
 
-- [ ] Create GitHub repo with clean directory structure:
-  - `data/` — ingestion scripts and raw data utilities
-  - `research/` — notebooks, hypothesis notes, diagnostics
-  - `backtest/` — engine, strategy classes, portfolio
-  - `execution/` — Almgren-Chriss model, cost components
-  - `config/` — `SpreadDefinition` YAML configs (one per pair); no tickers hardcoded in code
-  - `ui/` — Plotly Dash app
-- [ ] Write `docker-compose.yml` spinning up Postgres 16 + pgAdmin; define `.env` with DB credentials
-- [ ] Define DB schema and write SQLAlchemy models for:
-  - `contracts` — metadata (ticker, exchange, expiry, first_notice_date, last_trade_date)
-  - `ohlcv_bars` — OHLCV at daily resolution per contract
-  - `spreads` — computed spread series with regime flags
-  - `roll_calendar` — historical roll dates and OI crossover dates
-  - `signals` — signal values, z-scores, entry/exit flags per bar
-  - `orders` — full audit log of all simulated trades
-  - `backtest_runs` — run metadata, parameters hash, summary stats
-- [ ] Implement the `SpreadDefinition` config loader (`config/*.yaml` → typed object): legs, weights/hedge ratio, spread type (`calendar` / `cross_market` / `crack` / `crush` / `ratio`), economic tether, expected half-life. **All downstream code reads tickers from configs — never hardcoded.**
-- [ ] **Data sourcing (two tiers):**
-  - **Contract-level monthlies** (required for calendar spreads): source individual contract months (CLF, CLG, CLH … BZF, BZG …) from **Databento / Barchart / Nasdaq Data Link**. ⚠️ yfinance does _not_ reliably serve expired individual contract months — do not rely on it for calendars.
+- [x] Create GitHub repo with clean directory structure:
+  - `data/` - ingestion scripts and raw data utilities
+  - `research/` - notebooks, hypothesis notes, diagnostics
+  - `backtest/` - engine, strategy classes, portfolio
+  - `execution/` - Almgren-Chriss model, cost components
+  - `config/` - `SpreadDefinition` YAML configs (one per pair); no tickers hardcoded in code
+  - `ui/` - Plotly Dash app
+- [x] Write `docker-compose.yml` spinning up Postgres 16 + pgAdmin; define `.env` with DB credentials
+- [x] Define DB schema and write SQLAlchemy models for:
+  - `contracts` - metadata (ticker, exchange, expiry, first_notice_date, last_trade_date)
+  - `ohlcv_bars` - OHLCV at daily resolution per contract
+  - `spreads` - computed spread series with regime flags
+  - `roll_calendar` - historical roll dates and OI crossover dates
+  - `signals` - signal values, z-scores, entry/exit flags per bar
+  - `orders` - full audit log of all simulated trades
+  - `backtest_runs` - run metadata, parameters hash, summary stats
+- [x] Implement the `SpreadDefinition` config loader (`config/*.yaml` → typed object): legs, weights/hedge ratio, spread type (`calendar` / `cross_market` / `crack` / `crush` / `ratio`), economic tether, expected half-life. **All downstream code reads tickers from configs - never hardcoded.**
+- [x] **Data sourcing (two tiers):**
+  - **Contract-level monthlies** (required for calendar spreads): source individual contract months (CLF, CLG, CLH … BZF, BZG …) from **Databento / Barchart / Nasdaq Data Link**. ⚠️ yfinance does _not_ reliably serve expired individual contract months - do not rely on it for calendars.
   - **Continuous front-months** (sufficient for cross-market spreads like Brent–WTI): yfinance `CL=F`, `BZ=F` as a free, fast path and as a sanity cross-check against the paid feed.
-- [ ] Write `data/ingest.py`: pull daily OHLCV for the contract months named by the active `SpreadDefinition`(s) from the configured provider and write to Postgres; provider is a config/adapter, not hardcoded
+- [x] Write `data/ingest.py`: pull daily OHLCV for the contract months named by the active `SpreadDefinition`(s) from the configured provider and write to Postgres; provider is a config/adapter, not hardcoded
 
 ### Roll calendar, continuous series builder, spread construction
 
-- [ ] Build `data/roll_calendar.py`: expiry/first-notice/last-trade dates per exchange-product (CME WTI, ICE Brent to start) for last 5+ years; store in `roll_calendar` table keyed by product so new products are added as data, not code
-- [ ] Build `data/series_builder.py` (pair-agnostic): stitch individual contracts into continuous front-month and second-month series for any product, using both calendar-based roll (N days before expiry) and OI-based roll — expose as a config param
-- [ ] Construct and store spread series from `SpreadDefinition` configs (the engine builds whatever spreads are configured). First three configs:
+- [x] Build `data/roll_calendar.py`: expiry/first-notice/last-trade dates per exchange-product (CME WTI, ICE Brent to start) for last 5+ years; store in `roll_calendar` table keyed by product so new products are added as data, not code
+- [x] Build `data/series_builder.py` (pair-agnostic): stitch individual contracts into continuous front-month and second-month series for any product, using both calendar-based roll (N days before expiry) and OI-based roll - expose as a config param
+- [x] Construct and store spread series from `SpreadDefinition` configs (the engine builds whatever spreads are configured). First three configs:
   - WTI calendar spread: `M1 – M2` (`spread_type: calendar`)
   - Brent calendar spread: `M1 – M2` (`spread_type: calendar`)
   - Cross-market spread: `Brent_M1 – WTI_M1` (`spread_type: cross_market`; hedge ratio β from cointegration)
-- [ ] Plot all configured spread series in a Jupyter notebook; mark roll dates on the chart; visually inspect for roll artefacts (false jumps at expiry) and fix before proceeding
-- [ ] Annotate roll windows (roll_offset_days before expiry, inclusive) as a flag column in the `spreads` table
+- [x] Plot all configured spread series in a Jupyter notebook; mark roll dates on the chart; visually inspect for roll artefacts (false jumps at expiry) and fix before proceeding
+- [x] Annotate roll windows (roll_offset_days before expiry, inclusive) as a flag column in the `spreads` table
 
 ---
 
@@ -75,45 +75,45 @@
 
 Before proceeding to Phase 2, confirm all of the following:
 
-- [ ] `docker-compose up` runs without errors; Postgres is accessible via pgAdmin
-- [ ] All SQLAlchemy models migrate cleanly with no errors
-- [ ] `ingest.py` pulls data for at least 5 years of history for WTI and Brent contracts
-- [ ] `series_builder.py` produces a continuous front-month and second-month series for both WTI and Brent
-- [ ] All three spread series (WTI cal, Brent cal, Brent–WTI) are stored in the `spreads` table
-- [ ] Notebook chart of spread series looks sensible: no unexplained discontinuities; roll artefacts identified and handled
-- [ ] Roll window flag is populated in the `spreads` table
+- [x] `docker-compose up` runs without errors; Postgres is accessible via pgAdmin
+- [x] All SQLAlchemy models migrate cleanly with no errors
+- [x] `ingest.py` pulls data for at least 5 years of history for WTI and Brent contracts
+- [x] `series_builder.py` produces a continuous front-month and second-month series for both WTI and Brent
+- [x] All three spread series (WTI cal, Brent cal, Brent–WTI) are stored in the `spreads` table
+- [x] Notebook chart of spread series looks sensible: no unexplained discontinuities; roll artefacts identified and handled
+- [x] Roll window flag is populated in the `spreads` table
 
 ---
 
 <a name="phase-2"></a>
 
-## Phase 2 — Microstructure Diagnostics & Statistical Tests
+## Phase 2 - Microstructure Diagnostics & Statistical Tests
 
 **Focus: Research**
 
 ### Microstructure metrics and roll-window diagnostics
 
-> ⚠️ **Honesty note:** with daily OHLCV these are _proxies_, not true microstructure (which needs intraday/tick data). Label them as such everywhere. Real intraday liquidity/time-of-day effects are out of reach on daily bars — see the Phase 6 reframing.
+> ⚠️ **Honesty note:** with daily OHLCV these are _proxies_, not true microstructure (which needs intraday/tick data). Label them as such everywhere. Real intraday liquidity/time-of-day effects are out of reach on daily bars - see the Phase 6 reframing.
 
-- [ ] Compute daily microstructure _proxies_ per contract and store in Postgres:
+- [x] Compute daily microstructure _proxies_ per contract and store in Postgres:
   - Realised vol (20-day rolling)
   - Average volume and OI
   - Bid-ask proxy: `(High – Low) / Close`
-- [ ] Build `research/roll_diagnostics.py`: for each historical roll window (±10 days around expiry), compute average spread behaviour, realised vol, and volume
-- [ ] Create a "roll heat map" plot: x-axis = days to expiry, y-axis = calendar month/year, colour = spread vol or volume. Export as PNG.
-- [ ] Test statistically: does spread vol increase near roll? Does mean spread level shift?
-- [ ] Segment data into `roll_window` (roll_offset_days before expiry) vs. `mid_cycle` periods; store as regime flag in `spreads` table
-- [ ] Write 3–5 bullet hypothesis notes in `research/notes.md` based on what you observe
+- [x] Build `research/roll_diagnostics.py`: for each historical roll window (±10 days around expiry), compute average spread behaviour, realised vol, and volume
+- [x] Create a "roll heat map" plot: x-axis = days to expiry, y-axis = calendar month/year, colour = spread vol or volume. Export as PNG.
+- [x] Test statistically: does spread vol increase near roll? Does mean spread level shift?
+- [x] Segment data into `roll_window` (roll_offset_days before expiry) vs. `mid_cycle` periods; store as regime flag in `spreads` table
+- [x] Write 3–5 bullet hypothesis notes in `research/phase2_notes.md` based on what you observe
 
 ### Stationarity, cointegration, and structural breaks
 
-- [ ] Run ADF and KPSS tests on each spread series (WTI M1–M2, Brent M1–M2, Brent–WTI); confirm stationarity or degree of integration; document results
-- [ ] If testing outright price pairs: run Engle-Granger cointegration test and Johansen test using `statsmodels`; estimate hedge ratio β
-- [ ] Compute rolling half-life of mean reversion using the AR(1) regression:
+- [x] Run ADF and KPSS tests on each spread series (WTI M1–M2, Brent M1–M2, Brent–WTI); confirm stationarity or degree of integration; document results
+- [x] If testing outright price pairs: run Engle-Granger cointegration test and Johansen test using `statsmodels`; estimate hedge ratio β
+- [x] Compute rolling half-life of mean reversion using the AR(1) regression:
       $$ \Delta S*t = a + b \cdot S*{t-1} + \varepsilon $$
   Half-life = $$ -\ln(2)/b $$. Plot rolling half-life over time.
-- [ ] Check for structural breaks using Zivot-Andrews or rolling ADF window; note major regime changes (2008, 2020 COVID, 2022 Ukraine); store break points in a metadata table
-- [ ] Write a table in `research/notes.md` summarising ADF/KPSS p-values, half-lives, and break-point dates for all three spread series
+- [x] Check for structural breaks using Zivot-Andrews or rolling ADF window; note major regime changes (2008, 2020 COVID, 2022 Ukraine); store break points in a metadata table
+- [x] Write a table in `research/phase2_notes.md` summarising ADF/KPSS p-values, half-lives, and break-point dates for all three spread series
 
 ---
 
@@ -121,28 +121,28 @@ Before proceeding to Phase 2, confirm all of the following:
 
 Before proceeding to Phase 3, confirm all of the following:
 
-- [ ] Roll heat map chart produced and saved; shows interpretable pattern around expiry
-- [ ] ADF and KPSS results documented for all three spread series with p-values
-- [ ] Rolling half-life chart produced; half-life is between 3–30 days for at least one spread (otherwise strategy viability is questionable — revisit spread construction)
-- [ ] Structural break dates identified and stored in DB
-- [ ] `research/notes.md` has at least 5 hypothesis bullet points grounded in the diagnostics you ran
+- [x] Roll heat map chart produced and saved; shows interpretable pattern around expiry
+- [x] ADF and KPSS results documented for all three spread series with p-values
+- [x] Rolling half-life chart produced; half-life is between 3–30 days for at least one spread (otherwise strategy viability is questionable - revisit spread construction)
+- [x] Structural break dates identified and stored in DB
+- [x] `research/phase2_notes.md` has at least 5 hypothesis bullet points grounded in the diagnostics you ran
 
 ---
 
 <a name="phase-2-5"></a>
 
-## Phase 2.5 — Pair Screening (cointegration universe)
+## Phase 2.5 - Pair Screening (cointegration universe)
 
-**Focus: Research — this is what makes the engine reusable**
+**Focus: Research - this is what makes the engine reusable**
 
 This phase turns "is this pair tradeable?" into a repeatable, ranked report, so new commodities plug in via config + a screening pass rather than a rewrite. See §8–9 of [`PHASE0_FINANCIAL_REASONING.md`](./PHASE0_FINANCIAL_REASONING.md).
 
 - [ ] Build `research/pair_screener.py` that runs, for each candidate pair in the universe:
-  1. **Correlation pre-filter** — rolling return correlation (cheap necessary-not-sufficient cut)
-  2. **Cointegration** — Engle-Granger (2-leg) and Johansen (n-leg, yields hedge ratio β); record p-value and β
-  3. **Spread stationarity** — ADF + KPSS on the β-weighted spread
-  4. **Half-life** — AR(1) regression; keep pairs in the ~3–30 day tradeable band
-  5. **Stability** — rolling ADF / rolling cointegration to confirm it's not a single-period artefact; flag structural breaks
+  1. **Correlation pre-filter** - rolling return correlation (cheap necessary-not-sufficient cut)
+  2. **Cointegration** - Engle-Granger (2-leg) and Johansen (n-leg, yields hedge ratio β); record p-value and β
+  3. **Spread stationarity** - ADF + KPSS on the β-weighted spread
+  4. **Half-life** - AR(1) regression; keep pairs in the ~3–30 day tradeable band
+  5. **Stability** - rolling ADF / rolling cointegration to confirm it's not a single-period artefact; flag structural breaks
 - [ ] Run the screener over the drafted universe (Brent–WTI, gold–silver ratio, crack spread, crush spread, gold–platinum, platinum–palladium, corn–wheat, **copper–silver as a control you expect to fail**, etc.)
 - [ ] Emit `research/screening_report.md`: one row per pair with correlation, coint p-value, β, ADF/KPSS, half-life, stability, and a composite score = coint confidence × half-life suitability × stability
 - [ ] Promote the top-scoring pairs to `SpreadDefinition` configs; these feed the same downstream engine unchanged
@@ -151,14 +151,14 @@ This phase turns "is this pair tradeable?" into a repeatable, ranked report, so 
 
 - [ ] Screener runs over the full universe and produces a ranked `screening_report.md`
 - [ ] Brent–WTI passes; at least one _additional_ economically-grounded pair (crack/crush/gold–silver) passes
-- [ ] A pair you expected to fail (e.g. copper–silver) is correctly flagged as weak — proving the screen discriminates, not rubber-stamps
+- [ ] A pair you expected to fail (e.g. copper–silver) is correctly flagged as weak - proving the screen discriminates, not rubber-stamps
 - [ ] Promoted pairs run through the existing diagnostics with zero code changes (config-only)
 
 ---
 
 <a name="phase-3"></a>
 
-## Phase 3 — Signal Design & Regime Filters
+## Phase 3 - Signal Design & Regime Filters
 
 **Focus: Research**
 
@@ -211,7 +211,7 @@ Before proceeding to Phase 4, confirm all of the following:
 
 <a name="phase-4"></a>
 
-## Phase 4 — Backtest Engine Scaffold
+## Phase 4 - Backtest Engine Scaffold
 
 **Focus: Build**
 
@@ -241,11 +241,11 @@ Before proceeding to Phase 5, confirm all of the following:
 
 <a name="phase-5"></a>
 
-## Phase 5 — Full Backtest with Costs & Position Sizing
+## Phase 5 - Full Backtest with Costs & Position Sizing
 
 **Focus: Build**
 
-- [ ] Build `backtest/cost_model.py` with a `CostModel` class — all parameters configurable:
+- [ ] Build `backtest/cost_model.py` with a `CostModel` class - all parameters configurable:
   - Commission per contract (flat fee)
   - Bid-ask spread cost (HL-range proxy as fraction of price)
   - Preliminary slippage (fixed bps as a fallback before AC model is wired)
@@ -276,26 +276,26 @@ Before proceeding to Phase 6, confirm all of the following:
 
 <a name="phase-6"></a>
 
-## Phase 6 — Almgren-Chriss Execution Simulator
+## Phase 6 - Almgren-Chriss Execution Simulator
 
 **Focus: Execution**
 
-> ⚠️ **Reframe (read first):** Almgren-Chriss is an _intraday optimal-execution_ framework, and true impact/time-of-day liquidity need intraday data. On daily bars this model is **stylized/illustrative** — a principled way to _assume_ an execution cost structure and stress-test sensitivity to it, not a calibrated measurement. Present it that way. The time-of-day curve below is an _assumed_ shape (literature-based U-curve), not something estimated from your data. **Do not treat any specific "execution tax" as a success criterion** — report whatever the model produces and show sensitivity to η.
+> ⚠️ **Reframe (read first):** Almgren-Chriss is an _intraday optimal-execution_ framework, and true impact/time-of-day liquidity need intraday data. On daily bars this model is **stylized/illustrative** - a principled way to _assume_ an execution cost structure and stress-test sensitivity to it, not a calibrated measurement. Present it that way. The time-of-day curve below is an _assumed_ shape (literature-based U-curve), not something estimated from your data. **Do not treat any specific "execution tax" as a success criterion** - report whatever the model produces and show sensitivity to η.
 
 - [ ] Build `execution/almgren_chriss.py`:
   - Temporary market impact: $$ h(v) = \eta \cdot v^{\alpha} $$ where `v` = trade rate, `α ≈ 0.5–1.0`, start with `α = 1` (linear) then test nonlinear
   - Permanent market impact: $$ g(x) = \gamma \cdot x $$
   - Solve optimal TWAP execution schedule numerically (minimise variance of implementation shortfall)
   - Calibrate `η` from volume data using the square-root-of-volume heuristic
-- [ ] Add time-of-day liquidity adjustment: scale `η` by an **assumed** time-of-day factor (literature-based U-shaped curve — higher impact at open/close, lower mid-session). Note explicitly that this is assumed, not estimated, because daily bars carry no intraday information
+- [ ] Add time-of-day liquidity adjustment: scale `η` by an **assumed** time-of-day factor (literature-based U-shaped curve - higher impact at open/close, lower mid-session). Note explicitly that this is assumed, not estimated, because daily bars carry no intraday information
 - [ ] Integrate AC simulator into the backtest engine: for each trade, pass `(size, urgency, time_of_day, realised_vol)` → receive simulated fill price with cost breakdown:
   - Spread cost
   - Temporary impact cost
   - Permanent impact cost
   - Total implementation shortfall vs. mid-price
 - [ ] Run backtest in two modes side by side:
-  - **(A) Naïve fills** — mid-price with fixed slippage
-  - **(B) AC-simulated fills** — full execution cost model
+  - **(A) Naïve fills** - mid-price with fixed slippage
+  - **(B) AC-simulated fills** - full execution cost model
 - [ ] Compute and store the "execution tax": percentage reduction in Sharpe from A to B; percentage reduction in total PnL; average cost per trade by component
 
 ---
@@ -314,7 +314,7 @@ Before proceeding to Phase 7, confirm all of the following:
 
 <a name="phase-7"></a>
 
-## Phase 7 — Robustness Testing
+## Phase 7 - Robustness Testing
 
 **Focus: Research**
 
@@ -342,7 +342,7 @@ Before proceeding to Phase 8, confirm all of the following:
 
 <a name="phase-8"></a>
 
-## Phase 8 — Plotly Dash Dashboard
+## Phase 8 - Plotly Dash Dashboard
 
 **Focus: UI**
 
@@ -359,7 +359,7 @@ Before proceeding to Phase 8, confirm all of the following:
 - [ ] **Signals tab:**
   - [ ] Spread price chart with entry/exit markers
   - [ ] Z-score chart with entry/exit threshold lines
-  - [ ] Regime shading overlays: roll window, vol regime, liquidity regime — in different colours
+  - [ ] Regime shading overlays: roll window, vol regime, liquidity regime - in different colours
   - [ ] Rolling half-life chart over time
 
 ### Execution, robustness, and thesis card tabs
@@ -399,7 +399,7 @@ Before proceeding to Phase 9, confirm all of the following:
 
 <a name="phase-9"></a>
 
-## Phase 9 — Research Memo & GitHub Polish
+## Phase 9 - Research Memo & GitHub Polish
 
 **Focus: Polish**
 
@@ -442,7 +442,7 @@ Before proceeding to Phase 10, confirm all of the following:
 
 <a name="phase-10"></a>
 
-## Phase 10 — Interview Prep & Paper-Trade Scaffold
+## Phase 10 - Interview Prep & Paper-Trade Scaffold
 
 **Focus: Polish**
 
@@ -457,7 +457,7 @@ Before proceeding to Phase 10, confirm all of the following:
   - Where does this strategy definitively break down?
   - How would you improve the execution model?
   - What would you need to go live?
-- [ ] **Optional — paper-trade scaffold** (if scope allows):
+- [ ] **Optional - paper-trade scaffold** (if scope allows):
   - Build `live/paper_trader.py`: runs daily, fetches latest prices, recomputes signals, logs hypothetical trades to Postgres
   - Wire Telegram alerts for signal triggers and daily PnL (reuse the pattern from your crypto bots)
 - [ ] Record a Loom walkthrough of the dashboard: overview → signals tab → execution tab → robustness tab → thesis cards. Brief, crisp, technical.
@@ -465,7 +465,7 @@ Before proceeding to Phase 10, confirm all of the following:
 
 ---
 
-### ✅ Phase 10 Verification — Final Project Sign-Off
+### ✅ Phase 10 Verification - Final Project Sign-Off
 
 - [ ] `interview_qa.md` written with at least 15 Q&A pairs covering the categories above
 - [ ] You can explain the half-life calculation and its trading significance without notes
@@ -478,7 +478,7 @@ Before proceeding to Phase 10, confirm all of the following:
 
 <a name="cv-bullets"></a>
 
-## CV Bullets — Ready to Use
+## CV Bullets - Ready to Use
 
 Add these under a **"Projects"** or **"Quantitative Research"** section on your CV. Link the GitHub repo and Loom video.
 
@@ -576,4 +576,4 @@ Use this as your top-level tracker. Each item maps to a phase above.
 
 ---
 
-_Contingency: if scope is tight, cut the paper-trade scaffold (Phase 10) and the nonlinear-impact extensions of the AC model (Phase 6) first — they are the most optional. **Keep the carry/fair-value model (Phase 3): it is the economic core of the calendar-spread thesis, not an extra.** Keep Phase 0 and Phase 2.5 — they are what make the project coherent and reusable. Everything else is load-bearing._
+_Contingency: if scope is tight, cut the paper-trade scaffold (Phase 10) and the nonlinear-impact extensions of the AC model (Phase 6) first - they are the most optional. **Keep the carry/fair-value model (Phase 3): it is the economic core of the calendar-spread thesis, not an extra.** Keep Phase 0 and Phase 2.5 - they are what make the project coherent and reusable. Everything else is load-bearing._

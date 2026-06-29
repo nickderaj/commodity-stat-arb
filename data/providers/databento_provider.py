@@ -54,7 +54,7 @@ def _parse_available_end_from_error(msg: str) -> date | None:
 def _resolve_contract_month(symbol: str, product: str, max_bar_date) -> str | None:
     """Derive YYYY-MM contract month from a symbol and the latest bar date.
 
-    Uses the latest bar date to disambiguate the year digit — e.g. 'CLF8' with
+    Uses the latest bar date to disambiguate the year digit - e.g. 'CLF8' with
     bars through 2018 → '2018-01', while 'CLF8' with bars through 2026 → '2028-01'.
     The year is the earliest year Y such that Y % 10 == year_digit and Y >= max_bar_date.year.
     This is correct because futures bars only exist up to the contract's expiry month.
@@ -202,7 +202,7 @@ class DatabentoPovider(DataProvider):
         When multiple instrument_ids resolve to the same contract_month (e.g. the
         outright CLF8 future AND a CLF8-tagged calendar spread product both returned
         under the CL.FUT parent), we keep only the instrument with the highest total
-        volume — that is always the outright futures contract.
+        volume - that is always the outright futures contract.
         """
         df = data.to_df()
         if df.empty:

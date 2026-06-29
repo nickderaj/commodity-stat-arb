@@ -1,4 +1,4 @@
-"""Unit tests for roll calendar date calculations — no DB required."""
+"""Unit tests for roll calendar date calculations - no DB required."""
 
 from datetime import date
 import pytest

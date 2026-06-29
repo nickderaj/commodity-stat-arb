@@ -13,7 +13,7 @@ legs:
 weights: [1.0, -1.0]
 economic_tether: >
   Same cost-of-carry tether as WTI calendar but priced on waterborne North Sea crude.
-  Uses NYMEX Brent (BZ on GLBX.MDP3), cash-settled against ICE Brent — tracks closely.
+  Uses NYMEX Brent (BZ on GLBX.MDP3), cash-settled against ICE Brent - tracks closely.
   Brent carries a global supply-risk premium vs WTI.
 expected_half_life_days: 10
 roll_offset_days: 5

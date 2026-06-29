@@ -1,0 +1,32 @@
+{
+  "wti_calendar": [
+    {
+      "date": "2020-04-27",
+      "test": "zivot_andrews",
+      "stat": -5.389617593314789,
+      "p_value": 0.02001413219976364,
+      "cv_5pct": -5.07332,
+      "context": "WTI demand/supply shock \u2014 COVID collapse or Cushing storage crisis"
+    }
+  ],
+  "brent_calendar": [
+    {
+      "date": "2023-11-05",
+      "test": "zivot_andrews",
+      "stat": -4.733667654149529,
+      "p_value": 0.1261189526233492,
+      "cv_5pct": -5.07332,
+      "context": "Brent term structure regime change"
+    }
+  ],
+  "brent_wti": [
+    {
+      "date": "2019-05-31",
+      "test": "zivot_andrews",
+      "stat": -6.212908417926639,
+      "p_value": 0.0016089136487477994,
+      "cv_5pct": -5.07332,
+      "context": "Structural shift in Brent-WTI differential (Russia-Ukraine / US export capacity)"
+    }
+  ]
+}

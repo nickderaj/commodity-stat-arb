@@ -9,7 +9,7 @@ class YFinanceProvider(DataProvider):
     """Fetches continuous front-month futures via yfinance.
 
     Suitable for cross-market and ratio spreads (e.g. BZ=F, CL=F, GC=F, SI=F).
-    Not reliable for individual expired contract months — use DatabentoPovider for those.
+    Not reliable for individual expired contract months - use DatabentoPovider for those.
     """
 
     def fetch_ohlcv(
