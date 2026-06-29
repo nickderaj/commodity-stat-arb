@@ -1,0 +1,28 @@
+name: crack_321
+display_name: 3-2-1 Crack Spread
+spread_type: crack
+legs:
+  - ticker: CL=F
+    provider: yfinance
+    exchange: NYMEX
+    month_offset: 0
+    price_multiplier: 1.0
+  - ticker: RB=F
+    provider: yfinance
+    exchange: NYMEX
+    month_offset: 0
+    price_multiplier: 42.0
+  - ticker: HO=F
+    provider: yfinance
+    exchange: NYMEX
+    month_offset: 0
+    price_multiplier: 42.0
+weights: [-3.0, 2.0, 1.0]
+economic_tether: >
+  Refining margin: crude oil input (WTI) vs distillate outputs (RBOB gasoline + heating oil)
+  in 3-2-1 ratio. Physical refinery economics impose a floor (refiners shut if margin < variable cost)
+  and a ceiling (competition opens new capacity). Stable in normal regimes; 2022 Ukraine energy
+  shock caused an extreme regime shift (European refinery shortage). Vol filter required.
+expected_half_life_days: 28
+roll_offset_days: 5
+roll_mode: calendar

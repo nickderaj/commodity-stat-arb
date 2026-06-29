@@ -137,22 +137,22 @@ Before proceeding to Phase 3, confirm all of the following:
 
 This phase turns "is this pair tradeable?" into a repeatable, ranked report, so new commodities plug in via config + a screening pass rather than a rewrite. See §8–9 of [`PHASE0_FINANCIAL_REASONING.md`](./PHASE0_FINANCIAL_REASONING.md).
 
-- [ ] Build `research/pair_screener.py` that runs, for each candidate pair in the universe:
+- [x] Build `research/pair_screener.py` that runs, for each candidate pair in the universe:
   1. **Correlation pre-filter** - rolling return correlation (cheap necessary-not-sufficient cut)
   2. **Cointegration** - Engle-Granger (2-leg) and Johansen (n-leg, yields hedge ratio β); record p-value and β
   3. **Spread stationarity** - ADF + KPSS on the β-weighted spread
   4. **Half-life** - AR(1) regression; keep pairs in the ~3–30 day tradeable band
   5. **Stability** - rolling ADF / rolling cointegration to confirm it's not a single-period artefact; flag structural breaks
-- [ ] Run the screener over the drafted universe (Brent–WTI, gold–silver ratio, crack spread, crush spread, gold–platinum, platinum–palladium, corn–wheat, **copper–silver as a control you expect to fail**, etc.)
-- [ ] Emit `research/screening_report.md`: one row per pair with correlation, coint p-value, β, ADF/KPSS, half-life, stability, and a composite score = coint confidence × half-life suitability × stability
-- [ ] Promote the top-scoring pairs to `SpreadDefinition` configs; these feed the same downstream engine unchanged
+- [x] Run the screener over the drafted universe (Brent–WTI, gold–silver ratio, crack spread, crush spread, gold–platinum, platinum–palladium, corn–wheat, **copper–silver as a control you expect to fail**, etc.)
+- [x] Emit `research/screening_report.md`: one row per pair with correlation, coint p-value, β, ADF/KPSS, half-life, stability, and a composite score = coint confidence × half-life suitability × stability
+- [x] Promote the top-scoring pairs to `SpreadDefinition` configs; these feed the same downstream engine unchanged
 
 ### ✅ Phase 2.5 Verification
 
-- [ ] Screener runs over the full universe and produces a ranked `screening_report.md`
-- [ ] Brent–WTI passes; at least one _additional_ economically-grounded pair (crack/crush/gold–silver) passes
-- [ ] A pair you expected to fail (e.g. copper–silver) is correctly flagged as weak - proving the screen discriminates, not rubber-stamps
-- [ ] Promoted pairs run through the existing diagnostics with zero code changes (config-only)
+- [x] Screener runs over the full universe and produces a ranked `screening_report.md`
+- [x] Brent–WTI passes; at least one _additional_ economically-grounded pair (crack/crush/gold–silver) passes
+- [x] A pair you expected to fail (e.g. copper–silver) is correctly flagged as weak - proving the screen discriminates, not rubber-stamps
+- [x] Promoted pairs run through the existing diagnostics with zero code changes (config-only)
 
 ---
 
@@ -532,7 +532,7 @@ Use this as your top-level tracker. Each item maps to a phase above.
 ### Research
 
 - [ ] Roll-window microstructure diagnostics complete
-- [ ] Pair screener built; `screening_report.md` ranks the universe; ≥1 economically-grounded pair beyond Brent–WTI passes (Phase 2.5)
+- [x] Pair screener built; `screening_report.md` ranks the universe; ≥1 economically-grounded pair beyond Brent–WTI passes (Phase 2.5)
 - [ ] ADF/KPSS/Engle-Granger tests run and documented
 - [ ] Rolling half-life chart produced
 - [ ] Structural breaks identified

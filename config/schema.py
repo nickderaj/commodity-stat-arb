@@ -2,10 +2,11 @@ from pydantic import BaseModel, field_validator
 
 
 class LegConfig(BaseModel):
-    ticker: str       # root ticker, e.g. "CL" for WTI, "BZ=F" for yfinance continuous
-    provider: str     # "databento" | "yfinance"
-    exchange: str     # "CME" | "ICE" | "CBOE"
-    month_offset: int  # 0 = M1 (front), 1 = M2 (second month), etc.
+    ticker: str           # root ticker, e.g. "CL" for WTI, "BZ=F" for yfinance continuous
+    provider: str         # "databento" | "yfinance"
+    exchange: str         # "CME" | "ICE" | "COMEX" | "NYMEX" | "CBOT"
+    month_offset: int     # 0 = M1 (front), 1 = M2 (second month), etc.
+    price_multiplier: float = 1.0  # unit conversion (e.g. 42 for $/gal -> $/bbl)
 
 
 class SpreadDefinition(BaseModel):
