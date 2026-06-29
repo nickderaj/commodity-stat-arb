@@ -318,13 +318,13 @@ Before proceeding to Phase 7, confirm all of the following:
 
 **Focus: Research**
 
-- [ ] **Sub-period analysis:** split history into 3 periods (pre-2015, 2015–2019, 2020–present); run full backtest (with AC costs) on each; record Sharpe, drawdown, number of trades per period
-- [ ] **Walk-forward optimisation:** train on 2 years, test on 6 months, slide forward through history; compute out-of-sample efficiency ratio = OOS Sharpe / IS Sharpe; target > 0.5
-- [ ] **Parameter sensitivity:** build 2D grid of Sharpe vs. (entry z-score threshold, lookback window); confirm the strategy has a "ridge" of good performance, not a single lucky point
-- [ ] **Stress tests:**
-  - 2020 COVID vol spike: verify drawdown stayed bounded; check if vol/liquidity filter correctly suppressed entries
-  - 2022 Russia-Ukraine energy crisis: verify regime filter activated; document whether strategy was net positive or correctly flat
-- [ ] Summarise robustness results in `research/robustness_summary.md` with a pass/fail verdict for each test
+- [x] **Sub-period analysis:** split history into 3 periods (pre-2015, 2015–2019, 2020–present); run full backtest (with AC costs) on each; record Sharpe, drawdown, number of trades per period. **Note: pre-2015 data unavailable; 2 periods run. brent_wti positive in both (0.841 / 0.363). wti_calendar negative in both (-0.054 / -0.152).**
+- [x] **Walk-forward optimisation:** train on 2 years, test on 6 months, slide forward through history; compute out-of-sample efficiency ratio = OOS Sharpe / IS Sharpe; target > 0.5. **brent_wti avg efficiency=1.37 (PASS); brent_calendar avg=0.92 (PASS). WTI calendar has unstable IS Sharpe (near 0), making ratio noisy.**
+- [x] **Parameter sensitivity:** build 2D grid of Sharpe vs. (entry z-score threshold, lookback window); confirm the strategy has a "ridge" of good performance, not a single lucky point. **PASS: 22/35 combos (63%) within 50% of peak Sharpe on brent_wti. Broad ridge across entry=0.5–2.5 × lookback=20–90.**
+- [~] **Stress tests:**
+  - 2020 COVID vol spike: **WARN – wti_calendar max drawdown 56.87% (filter suppressed entries but couldn't exit open position before vol spike); brent_calendar max_dd -7.98% PASS; brent_wti max_dd -4.43% PASS.**
+  - 2022 Russia-Ukraine energy crisis: **PASS – all three spreads drawdown < 21%; brent_wti Sharpe=0.686 during crisis window; regime filter correctly suppressed high-vol entries.**
+- [x] Summarise robustness results in `research/robustness_summary.md` with a pass/fail verdict for each test
 
 ---
 
@@ -332,11 +332,11 @@ Before proceeding to Phase 7, confirm all of the following:
 
 Before proceeding to Phase 8, confirm all of the following:
 
-- [ ] Sub-period Sharpe table written; performance is not concentrated entirely in one period
-- [ ] Walk-forward efficiency ratio computed and documented
-- [ ] Parameter sensitivity heatmap produced; ridge of performance visible (not a spike)
-- [ ] Both stress test scenarios documented with pass/fail verdict
-- [ ] `robustness_summary.md` written and honest about where the strategy underperforms
+- [x] Sub-period Sharpe table written; performance is not concentrated entirely in one period (brent_wti positive in both available periods; wti_calendar underperforms consistently – documented)
+- [x] Walk-forward efficiency ratio computed and documented (brent_wti avg eff=1.37; brent_calendar avg=0.92; wti_calendar noisy due to near-zero IS Sharpe)
+- [x] Parameter sensitivity heatmap produced; ridge of performance visible (22/35 combos ≥50% of peak – broad, not a spike)
+- [~] Both stress test scenarios documented with pass/fail verdict – **FLAG: wti_calendar COVID drawdown 56.87% (WARN); all others PASS. Documented in robustness_summary.md.**
+- [x] `robustness_summary.md` written and honest about where the strategy underperforms
 
 ---
 
@@ -558,10 +558,10 @@ Use this as your top-level tracker. Each item maps to a phase above.
 
 ### Robustness
 
-- [ ] Sub-period analysis (3 periods)
-- [ ] Walk-forward optimisation with efficiency ratio
-- [ ] Parameter sensitivity heatmap
-- [ ] 2020 and 2022 stress tests
+- [x] Sub-period analysis (3 periods – 2 available; pre-2015 data absent from DB)
+- [x] Walk-forward optimisation with efficiency ratio
+- [x] Parameter sensitivity heatmap
+- [~] 2020 and 2022 stress tests (2022 all PASS; 2020 wti_calendar WARN-HIGH-DD 56.87%)
 
 ### Delivery
 
