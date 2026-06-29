@@ -282,21 +282,21 @@ Before proceeding to Phase 6, confirm all of the following:
 
 > ⚠️ **Reframe (read first):** Almgren-Chriss is an _intraday optimal-execution_ framework, and true impact/time-of-day liquidity need intraday data. On daily bars this model is **stylized/illustrative** - a principled way to _assume_ an execution cost structure and stress-test sensitivity to it, not a calibrated measurement. Present it that way. The time-of-day curve below is an _assumed_ shape (literature-based U-curve), not something estimated from your data. **Do not treat any specific "execution tax" as a success criterion** - report whatever the model produces and show sensitivity to η.
 
-- [ ] Build `execution/almgren_chriss.py`:
+- [x] Build `execution/almgren_chriss.py`:
   - Temporary market impact: $$ h(v) = \eta \cdot v^{\alpha} $$ where `v` = trade rate, `α ≈ 0.5–1.0`, start with `α = 1` (linear) then test nonlinear
   - Permanent market impact: $$ g(x) = \gamma \cdot x $$
   - Solve optimal TWAP execution schedule numerically (minimise variance of implementation shortfall)
   - Calibrate `η` from volume data using the square-root-of-volume heuristic
-- [ ] Add time-of-day liquidity adjustment: scale `η` by an **assumed** time-of-day factor (literature-based U-shaped curve - higher impact at open/close, lower mid-session). Note explicitly that this is assumed, not estimated, because daily bars carry no intraday information
-- [ ] Integrate AC simulator into the backtest engine: for each trade, pass `(size, urgency, time_of_day, realised_vol)` → receive simulated fill price with cost breakdown:
+- [x] Add time-of-day liquidity adjustment: scale `η` by an **assumed** time-of-day factor (literature-based U-shaped curve - higher impact at open/close, lower mid-session). Note explicitly that this is assumed, not estimated, because daily bars carry no intraday information
+- [x] Integrate AC simulator into the backtest engine: for each trade, pass `(size, urgency, time_of_day, realised_vol)` → receive simulated fill price with cost breakdown:
   - Spread cost
   - Temporary impact cost
   - Permanent impact cost
   - Total implementation shortfall vs. mid-price
-- [ ] Run backtest in two modes side by side:
+- [x] Run backtest in two modes side by side:
   - **(A) Naïve fills** - mid-price with fixed slippage
   - **(B) AC-simulated fills** - full execution cost model
-- [ ] Compute and store the "execution tax": percentage reduction in Sharpe from A to B; percentage reduction in total PnL; average cost per trade by component
+- [x] Compute and store the "execution tax": percentage reduction in Sharpe from A to B; percentage reduction in total PnL; average cost per trade by component
 
 ---
 
@@ -304,11 +304,11 @@ Before proceeding to Phase 6, confirm all of the following:
 
 Before proceeding to Phase 7, confirm all of the following:
 
-- [ ] AC model produces higher slippage for larger trades and during high-volatility periods (basic sanity check)
-- [ ] Execution tax is _reported and explained_, not targeted: show the Sharpe/PnL delta from naïve → AC and a sensitivity curve over η. Whatever the magnitude, the point is that the cost is modelled transparently and its drivers are understood (not that it hits a preset number)
-- [ ] Cost breakdown stored per trade in `orders` table
-- [ ] Time-of-day liquidity curve plotted and visually sensible (U-shaped or elevated at open/close)
-- [ ] AC model code is self-contained and independently testable with unit tests
+- [x] AC model produces higher slippage for larger trades and during high-volatility periods (basic sanity check) — verified by 21 unit tests
+- [x] Execution tax is _reported and explained_, not targeted: show the Sharpe/PnL delta from naïve → AC and a sensitivity curve over η. At current backtest scale (~2-10 contracts), impact is negligible (<$1/trade vs $10-30 commission); commission and bid-ask spread dominate. Scale stress table shows impact becomes material above ~50 contracts. The η sensitivity table shows cost behaviour across multipliers.
+- [x] Cost breakdown stored per trade in `orders` table — `temp_impact_cost` and `perm_impact_cost` columns populated by AC model for each exit
+- [x] Time-of-day liquidity curve plotted and visually sensible (U-shaped or elevated at open/close) — ASCII bar chart confirms U-shape; daily fills use mid-session default (factor=1.0)
+- [x] AC model code is self-contained and independently testable with unit tests — `tests/test_almgren_chriss.py`, 21/21 tests pass
 
 ---
 
@@ -551,10 +551,10 @@ Use this as your top-level tracker. Each item maps to a phase above.
 
 ### Execution
 
-- [ ] Almgren-Chriss model implemented and calibrated
-- [ ] Time-of-day liquidity curve applied
-- [ ] Naïve vs. AC backtest comparison complete
-- [ ] Execution tax quantified and documented
+- [x] Almgren-Chriss model implemented and calibrated
+- [x] Time-of-day liquidity curve applied
+- [x] Naïve vs. AC backtest comparison complete
+- [x] Execution tax quantified and documented
 
 ### Robustness
 

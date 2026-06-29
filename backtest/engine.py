@@ -40,6 +40,7 @@ from backtest.sizing import ATRSizing, FixedFractionalSizing, SizingModel, compu
 from backtest.strategy import Strategy, ZScoreStrategy
 from db.models import BacktestRun, Order
 from db.session import get_session
+from execution.almgren_chriss import ACResult, AlmgrenChrissModel
 
 
 class BacktestEngine:
@@ -68,6 +69,7 @@ class BacktestEngine:
         initial_capital: float = 100_000.0,
         cost_model: Optional[CostModel] = None,
         sizing_model: Optional[SizingModel] = None,
+        ac_model: Optional[AlmgrenChrissModel] = None,
         atr_window: int = 14,
     ) -> None:
         self.strategy = strategy
@@ -75,8 +77,10 @@ class BacktestEngine:
         self.initial_capital = initial_capital
         self.cost_model = cost_model
         self.sizing_model = sizing_model
+        self.ac_model = ac_model
         self.atr_window = atr_window
         self.portfolio = Portfolio(initial_capital)
+        self._adv_bbls: Optional[float] = None  # loaded lazily from DB
 
     # ------------------------------------------------------------------
     # Main run
@@ -108,6 +112,10 @@ class BacktestEngine:
         # Load data and pre-compute signals (shift(1) applied inside strategy)
         df = self.strategy.load_data(self.spread_name, start_date, end_date)
 
+        # Pre-load ADV for AC model (once per run, not per bar)
+        if self.ac_model is not None and self._adv_bbls is None:
+            self._adv_bbls = self._load_adv_from_db(self.spread_name)
+
         if df.empty:
             raise ValueError(f"No spread data found for '{self.spread_name}' in the given date range")
 
@@ -135,10 +143,15 @@ class BacktestEngine:
 
             if current != 0 and desired == 0:
                 # Exit: compute costs and close position
+                atr_at_exit = float(atr_series.iloc[i]) if not np.isnan(atr_series.iloc[i]) else 1.0
                 costs = self._compute_costs(
                     entry_price=self.portfolio.entry_price,
                     exit_price=spread_value,
                     quantity=self.portfolio.entry_quantity,
+                )
+                ac = self._compute_ac_costs(
+                    quantity=self.portfolio.entry_quantity,
+                    sigma=atr_at_exit,
                 )
                 self.portfolio.on_exit(
                     bar_date,
@@ -146,6 +159,8 @@ class BacktestEngine:
                     fees=costs.commission,
                     slippage=costs.slippage,
                     spread_cost=costs.spread_cost,
+                    temp_impact_cost=ac.temp_impact_cost,
+                    perm_impact_cost=ac.perm_impact_cost,
                 )
 
             elif current == 0 and desired in (-1, 1):
@@ -172,10 +187,15 @@ class BacktestEngine:
         if self.portfolio.position != 0:
             last_date = df.index[-1].date()
             last_price = float(df["value"].iloc[-1])
+            last_atr = float(atr_series.iloc[-1]) if not np.isnan(atr_series.iloc[-1]) else 1.0
             costs = self._compute_costs(
                 entry_price=self.portfolio.entry_price,
                 exit_price=last_price,
                 quantity=self.portfolio.entry_quantity,
+            )
+            ac = self._compute_ac_costs(
+                quantity=self.portfolio.entry_quantity,
+                sigma=last_atr,
             )
             self.portfolio.on_exit(
                 last_date,
@@ -183,6 +203,8 @@ class BacktestEngine:
                 fees=costs.commission,
                 slippage=costs.slippage,
                 spread_cost=costs.spread_cost,
+                temp_impact_cost=ac.temp_impact_cost,
+                perm_impact_cost=ac.perm_impact_cost,
             )
 
         # ------------------------------------------------------------------
@@ -197,6 +219,7 @@ class BacktestEngine:
             **self.strategy.params,
             **(self.cost_model.as_dict() if self.cost_model else {"cost_model": "none"}),
             **(self.sizing_model.as_dict() if self.sizing_model else {"sizing": "unit"}),
+            **(self.ac_model.as_dict() if self.ac_model else {"ac_model": "none"}),
         }
         params_hash = _hash_params(params)
 
@@ -231,6 +254,57 @@ class BacktestEngine:
             exit_price=exit_price,
             quantity=quantity,
         )
+
+    def _compute_ac_costs(self, quantity: int, sigma: float) -> ACResult:
+        """Compute Almgren-Chriss impact costs; returns zero result when no AC model."""
+        if self.ac_model is None:
+            return ACResult(
+                temp_impact_cost=0.0,
+                perm_impact_cost=0.0,
+                total_shortfall=0.0,
+                participation_rate=0.0,
+                eta_effective=0.0,
+                tod_factor=1.0,
+            )
+        adv = self._adv_bbls or 500_000.0  # fallback: ~500 CL contracts
+        return self.ac_model.compute(
+            quantity_bbls=float(quantity),
+            sigma_per_bbl=max(sigma, 1e-6),
+            adv_bbls=adv,
+            hour=None,  # daily bars: assume mid-session
+        )
+
+    def _load_adv_from_db(self, spread_name: str) -> float:
+        """Query average daily volume (bbls) from contract_metrics for this spread."""
+        PRODUCT_MAP: dict[str, list[str]] = {
+            "wti_calendar": ["CL"],
+            "brent_calendar": ["BZ"],
+            "brent_wti": ["CL", "BZ"],
+        }
+        products = PRODUCT_MAP.get(spread_name, ["CL"])
+
+        session = get_session()
+        try:
+            from db.models import Contract, ContractMetrics
+            from sqlalchemy import func
+
+            avg_vol = (
+                session.query(func.avg(ContractMetrics.avg_volume_20d))
+                .join(Contract, ContractMetrics.contract_id == Contract.id)
+                .filter(
+                    Contract.product.in_(products),
+                    ContractMetrics.avg_volume_20d.isnot(None),
+                    ContractMetrics.avg_volume_20d > 0,
+                )
+                .scalar()
+            )
+            if avg_vol is None or avg_vol <= 0:
+                return 500_000.0
+            return float(avg_vol)
+        except Exception:
+            return 500_000.0
+        finally:
+            session.close()
 
     def _compute_size(self, equity: float, spread_price: float, atr: float) -> int:
         """Delegate to SizingModel; returns 1 when no model configured."""
