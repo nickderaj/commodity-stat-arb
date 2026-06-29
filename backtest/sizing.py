@@ -6,7 +6,7 @@ Two methods, both ATR-driven (rolling std of spread as volatility proxy):
 
 Both include a max-leverage cap so no single trade exceeds a hard notional limit.
 The quantity returned is in "units" (bbls for a spread quoted in $/bbl), not
-exchange contracts — divide by 1000 mentally to get approximate WTI/Brent lots.
+exchange contracts - divide by 1000 mentally to get approximate WTI/Brent lots.
 """
 
 from __future__ import annotations

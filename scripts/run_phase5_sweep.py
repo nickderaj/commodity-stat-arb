@@ -3,7 +3,7 @@
 Runs the event-driven engine with the CostModel and both sizing methods across
 all configured spread candidates. Each unique (spread, signal params, cost params,
 sizing params) combination gets one row in backtest_runs with a deterministic hash
-— re-running is idempotent.
+- re-running is idempotent.
 
 Prints a ranked summary table of runs sorted by Sharpe ratio.
 
@@ -126,7 +126,7 @@ def _print_row(r: dict) -> None:
 
 def print_summary(df: pd.DataFrame) -> None:
     print("\n" + "=" * 80)
-    print("PHASE 5 SWEEP RESULTS — ranked by Sharpe ratio")
+    print("PHASE 5 SWEEP RESULTS - ranked by Sharpe ratio")
     print("=" * 80)
 
     numeric_cols = ["sharpe", "sortino", "calmar", "max_dd", "win_rate", "profit_factor", "avg_pnl", "avg_dur_days"]
@@ -182,7 +182,7 @@ def print_summary(df: pd.DataFrame) -> None:
 def run_cost_impact_comparison(write_to_db: bool = True) -> None:
     """Run zero-cost vs. cost-model side-by-side for the best signal config per spread."""
     print("\n" + "=" * 80)
-    print("COST IMPACT COMPARISON — zero-cost vs. with-costs (entry=2.0, exit=0.75, lb=60)")
+    print("COST IMPACT COMPARISON - zero-cost vs. with-costs (entry=2.0, exit=0.75, lb=60)")
     print("=" * 80)
 
     best_sig = SIGNAL_CONFIGS[2]  # entry=2.0, exit=0.75, lb=60 (best candidate)

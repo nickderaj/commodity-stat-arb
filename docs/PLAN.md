@@ -258,7 +258,7 @@ Before proceeding to Phase 5, confirm all of the following:
   - Sharpe ratio, Sortino ratio, Calmar ratio
   - Max drawdown (absolute and as % of peak equity)
   - Win rate, profit factor, average trade duration
-  - Number of trades, average PnL per trade
+  - Number of trades, average PnL per tradeß
 
 ---
 
@@ -266,9 +266,9 @@ Before proceeding to Phase 5, confirm all of the following:
 
 Before proceeding to Phase 6, confirm all of the following:
 
-- [x] `CostModel` reduces net PnL meaningfully vs. zero-cost run — confirmed: -7.1% (WTI cal), -3.8% (Brent cal), -2.6% (Brent–WTI)
+- [x] `CostModel` reduces net PnL meaningfully vs. zero-cost run - confirmed: -7.1% (WTI cal), -3.8% (Brent cal), -2.6% (Brent–WTI)
 - [x] All backtest runs stored in `backtest_runs` table; re-running with same param hash produces identical results (idempotency verified: "already exists" message on re-run)
-- [~] At least one spread/sizing combination shows Sharpe > 0.8 after costs — **FLAG: best observed is 0.412 (Brent–WTI, entry=2.0, lookback=60)**. Strategy is profitable with positive Sharpe and 73% win rate / 6.4x profit factor, but does not reach 0.8. Cost model is correctly calibrated; alpha is moderate on daily bars. Phase 6 AC model will provide a more precise cost picture.
+- [~] At least one spread/sizing combination shows Sharpe > 0.8 after costs - **FLAG: best observed is 0.412 (Brent–WTI, entry=2.0, lookback=60)**. Strategy is profitable with positive Sharpe and 73% win rate / 6.4x profit factor, but does not reach 0.8. Cost model is correctly calibrated; alpha is moderate on daily bars. Phase 6 AC model will provide a more precise cost picture.
 - [x] Performance metrics table printed and cross-checked manually for at least one run
 - [x] Position sizes are reasonable: risk_pct=1% by design → max risk ≈ $1k per trade on $100k capital (well within 2–3%)
 
@@ -304,11 +304,11 @@ Before proceeding to Phase 6, confirm all of the following:
 
 Before proceeding to Phase 7, confirm all of the following:
 
-- [x] AC model produces higher slippage for larger trades and during high-volatility periods (basic sanity check) — verified by 21 unit tests
+- [x] AC model produces higher slippage for larger trades and during high-volatility periods (basic sanity check) - verified by 21 unit tests
 - [x] Execution tax is _reported and explained_, not targeted: show the Sharpe/PnL delta from naïve → AC and a sensitivity curve over η. At current backtest scale (~2-10 contracts), impact is negligible (<$1/trade vs $10-30 commission); commission and bid-ask spread dominate. Scale stress table shows impact becomes material above ~50 contracts. The η sensitivity table shows cost behaviour across multipliers.
-- [x] Cost breakdown stored per trade in `orders` table — `temp_impact_cost` and `perm_impact_cost` columns populated by AC model for each exit
-- [x] Time-of-day liquidity curve plotted and visually sensible (U-shaped or elevated at open/close) — ASCII bar chart confirms U-shape; daily fills use mid-session default (factor=1.0)
-- [x] AC model code is self-contained and independently testable with unit tests — `tests/test_almgren_chriss.py`, 21/21 tests pass
+- [x] Cost breakdown stored per trade in `orders` table - `temp_impact_cost` and `perm_impact_cost` columns populated by AC model for each exit
+- [x] Time-of-day liquidity curve plotted and visually sensible (U-shaped or elevated at open/close) - ASCII bar chart confirms U-shape; daily fills use mid-session default (factor=1.0)
+- [x] AC model code is self-contained and independently testable with unit tests - `tests/test_almgren_chriss.py`, 21/21 tests pass
 
 ---
 

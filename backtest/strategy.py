@@ -2,7 +2,7 @@
 
 The engine calls strategy.on_bar(idx, current_position) on each bar iteration.
 Strategies pre-compute all signals in load_data() using shift(1) to guarantee
-zero look-ahead bias — signals at bar t use data through bar t-1 only.
+zero look-ahead bias - signals at bar t use data through bar t-1 only.
 """
 
 from __future__ import annotations

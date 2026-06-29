@@ -1,10 +1,10 @@
-"""Phase 6: Almgren-Chriss execution simulator — naïve vs. AC backtest comparison.
+"""Phase 6: Almgren-Chriss execution simulator - naïve vs. AC backtest comparison.
 
 Runs the best signal configuration (entry=2.0, exit=0.75, lookback=60) on all
 three spread candidates in two modes:
 
-  (A) Naïve fills  — mid-price + fixed CostModel slippage (Phase 5 baseline)
-  (B) AC fills     — mid-price + CostModel (commission + spread, no fixed
+  (A) Naïve fills  - mid-price + fixed CostModel slippage (Phase 5 baseline)
+  (B) AC fills     - mid-price + CostModel (commission + spread, no fixed
                      slippage) + AlmgrenChrissModel (temp + perm impact)
 
 The difference between A and B is the "execution tax": additional cost from
@@ -212,7 +212,7 @@ def run_eta_sensitivity(write_to_db: bool = True) -> None:
     """Show how Sharpe and PnL change as η scales up/down (brent_wti, best config)."""
     spread = "brent_wti"
     print("=" * 70)
-    print(f"η SENSITIVITY ANALYSIS — {spread}, entry=2.0, lb=60")
+    print(f"η SENSITIVITY ANALYSIS - {spread}, entry=2.0, lb=60")
     print("=" * 70)
     print(f"(All other params fixed; only η and γ scaled by multiplier)")
     print()
@@ -287,7 +287,7 @@ def run_eta_sensitivity(write_to_db: bool = True) -> None:
 
 def print_tod_curve() -> None:
     print("=" * 70)
-    print("TIME-OF-DAY LIQUIDITY MULTIPLIER (assumed U-shape — not estimated from data)")
+    print("TIME-OF-DAY LIQUIDITY MULTIPLIER (assumed U-shape - not estimated from data)")
     print("=" * 70)
     print("  Impact at open and close is elevated relative to mid-session.")
     print("  Daily bar fills use hour=None → factor=1.0 (mid-session default).\n")
@@ -321,7 +321,7 @@ def print_summary(df: pd.DataFrame) -> None:
     print()
 
     # Per-component breakdown
-    print("Average per-trade cost breakdown (Mode B — AC fills):")
+    print("Average per-trade cost breakdown (Mode B - AC fills):")
     cost_cols = ["spread", "avg_commission", "avg_spread_cost", "avg_temp_impact", "avg_perm_impact"]
     if all(c in df.columns for c in cost_cols):
         display2 = df[cost_cols].copy()

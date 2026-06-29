@@ -149,7 +149,7 @@ class AlmgrenChrissModel:
     def time_of_day_factor(hour: Optional[float] = None) -> float:
         """U-shaped intraday liquidity multiplier.
 
-        ASSUMED shape based on literature — not estimated from data (daily bars
+        ASSUMED shape based on literature - not estimated from data (daily bars
         carry no intraday information). At market open and close, liquidity is
         tighter and impact is elevated. Mid-session is the cheapest to execute.
 
