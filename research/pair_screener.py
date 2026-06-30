@@ -33,6 +33,7 @@ from research.stats import (
     composite_score,
     compute_half_life,
     rolling_correlation,
+    rolling_half_life,
     rolling_stability,
     run_adf,
     run_engle_granger,
@@ -253,7 +254,6 @@ def screen_pair(candidate: CandidatePair, prices: pd.DataFrame) -> ScreeningResu
     kpss_res = run_kpss(spread)
 
     # 4. Half-life
-    from research.stats import rolling_half_life
     rl_hl = rolling_half_life(spread, window=min(252, len(spread) // 3), step=21)
     hl_vals = rl_hl["half_life"].dropna()
     mean_hl = float(hl_vals.mean()) if len(hl_vals) > 0 else np.nan

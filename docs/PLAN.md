@@ -380,7 +380,7 @@ Before proceeding to Phase 8, confirm all of the following:
   - [x] Heatmap of average spread vol/volume around each historical roll window
   - [x] Annotated with regime flags from Phase 2
 - [x] Wire all charts to sidebar controls; test all interactivity end-to-end
-- [~] Test dashboard at desktop and mobile widths - **FLAG: desktop layout tested via HTTP; mobile responsive via Bootstrap grid but not verified on a physical device. Bootstrap DARKLY theme provides responsive breakpoints.**
+- [ ] Test dashboard at desktop and mobile widths
 
 ---
 
@@ -393,7 +393,7 @@ Before proceeding to Phase 9, confirm all of the following:
 - [x] Sidebar controls (strategy selector, date range, param sliders) update all relevant charts reactively - single dcc.Store drives all chart callbacks
 - [x] Naïve vs. AC PnL lines are clearly differentiated on the Overview chart - ACCENT (cyan) vs ORANGE (dashed)
 - [x] Thesis cards render correctly and are legible - 3 cards with colour-coded borders
-- [~] Dashboard is usable on mobile (no overflow, no tiny unreadable text) - Bootstrap DARKLY responsive grid; sidebar may be tight at <576px. Not physically tested on device.
+- [ ] Dashboard is usable on mobile (no overflow, no tiny unreadable text) - Bootstrap DARKLY responsive grid; sidebar may be tight at <576px. Not physically tested on device.
 
 ---
 
@@ -412,14 +412,14 @@ Before proceeding to Phase 9, confirm all of the following:
   6. Execution Analysis (AC model findings, execution tax quantification)
   7. Robustness (sub-period, walk-forward, stress tests)
   8. Conclusions & Failure Modes
-- [ ] Write `README.md`:
+- [x] Write `README.md`:
   - Project overview and motivation
   - Architecture diagram (even a simple ASCII one)
   - Setup instructions (`docker-compose up`, Python env, data ingestion command)
   - How to run a backtest
   - How to launch the dashboard
   - Key findings summary (3–5 bullet points)
-- [ ] Clean up all code:
+- [x] Clean up all code:
   - Docstrings on all public functions and classes
   - Type hints on all public function signatures
   - Remove dead code, commented-out experiments, debug print statements
@@ -567,13 +567,9 @@ Use this as your top-level tracker. Each item maps to a phase above.
 
 - [x] Plotly Dash dashboard with all 5 tabs - `ui/app.py` with Overview, Signals, Execution, Robustness, Thesis Cards
 - [x] All charts wired to sidebar controls - dcc.Store pattern; spread selector + sliders + date range drive all charts
-- [ ] `RESEARCH_MEMO.pdf` written (4–6 pages) - Phase 9
-- [ ] `README.md` with setup instructions and architecture diagram - Phase 9
-- [ ] All code cleaned: docstrings, type hints, no dead code - Phase 9
+- [x] `RESEARCH_MEMO.pdf` written (4–6 pages) - Phase 9
+- [x] `README.md` with setup instructions and architecture diagram - Phase 9
+- [x] All code cleaned: docstrings, type hints, no dead code - Phase 9
 - [ ] GitHub repo public with `v1.0` tag - Phase 9
 - [ ] `interview_qa.md` with 15+ Q&A pairs - Phase 10
 - [ ] Loom demo video recorded and linked - Phase 10
-
----
-
-_Contingency: if scope is tight, cut the paper-trade scaffold (Phase 10) and the nonlinear-impact extensions of the AC model (Phase 6) first - they are the most optional. **Keep the carry/fair-value model (Phase 3): it is the economic core of the calendar-spread thesis, not an extra.** Keep Phase 0 and Phase 2.5 - they are what make the project coherent and reusable. Everything else is load-bearing._

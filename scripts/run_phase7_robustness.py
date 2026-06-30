@@ -115,6 +115,7 @@ def _run(
 # ---------------------------------------------------------------------------
 
 def run_sub_period(write_to_db: bool = False) -> pd.DataFrame:
+    """Run backtest on each sub-period for each spread. Returns long-form results DataFrame."""
     print("\n" + "=" * 70)
     print("1. SUB-PERIOD ANALYSIS")
     print("=" * 70)
@@ -178,6 +179,7 @@ def _generate_wf_windows(data_start: str, data_end: str) -> list[tuple[str, str,
 
 
 def run_walk_forward(write_to_db: bool = False) -> pd.DataFrame:
+    """Run walk-forward IS/OOS splits and compute efficiency ratios. Returns results DataFrame."""
     print("\n" + "=" * 70)
     print("2. WALK-FORWARD OPTIMISATION (train=2yr, test=6mo)")
     print("=" * 70)
@@ -239,6 +241,7 @@ def run_walk_forward(write_to_db: bool = False) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def run_parameter_sensitivity(write_to_db: bool = False) -> pd.DataFrame:
+    """Run 2D grid of (entry_threshold x lookback) for SENSITIVITY_SPREAD. Returns results DataFrame."""
     print("\n" + "=" * 70)
     print(f"3. PARAMETER SENSITIVITY GRID – {SENSITIVITY_SPREAD}")
     print("=" * 70)
@@ -296,6 +299,7 @@ def run_parameter_sensitivity(write_to_db: bool = False) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def run_stress_tests(write_to_db: bool = False) -> pd.DataFrame:
+    """Run backtest over stress-test windows (COVID 2020, Russia-Ukraine 2022). Returns results DataFrame."""
     print("\n" + "=" * 70)
     print("4. STRESS TESTS")
     print("=" * 70)

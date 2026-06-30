@@ -24,6 +24,7 @@ warnings.filterwarnings("ignore")
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from db.session import get_session
+from research.signals import load_spread_df
 from research.stats import compute_half_life, rolling_half_life, run_adf, run_kpss
 
 OUTPUT_DIR = Path(__file__).parent / "outputs"
@@ -46,24 +47,6 @@ CALENDAR_SPREADS = {
 # ---------------------------------------------------------------------------
 # Data loading
 # ---------------------------------------------------------------------------
-
-def load_spread_df(spread_name: str) -> pd.DataFrame:
-    session = get_session()
-    try:
-        rows = session.execute(
-            text("""
-                SELECT date, value, leg1_price, leg2_price, regime, roll_window_flag
-                FROM spreads WHERE spread_name = :name ORDER BY date
-            """),
-            {"name": spread_name},
-        ).fetchall()
-    finally:
-        session.close()
-
-    df = pd.DataFrame(rows, columns=["date", "value", "leg1_price", "leg2_price", "regime", "roll_window_flag"])
-    df["date"] = pd.to_datetime(df["date"])
-    return df.set_index("date").sort_index()
-
 
 def load_term_structure(product: str, n_months: int = 6) -> pd.DataFrame:
     """For each date, load the nearest n_months contract closes from ohlcv_bars.
@@ -165,10 +148,8 @@ def save_ts_regime(spread_name: str, ts_regime: pd.Series) -> None:
 # Stationarity comparison
 # ---------------------------------------------------------------------------
 
-def compare_stationarity(raw_spread: pd.Series, excess_spread: pd.Series) -> None:
+def compare_stationarity(raw_spread: pd.Series, excess_spread: pd.Series) -> dict:
     """Print ADF / half-life comparison: raw spread vs excess spread."""
-    from research.stats import rolling_half_life, run_adf
-
     print("\n  Stationarity comparison (raw spread vs excess spread):")
     print(f"  {'Metric':<30} {'Raw spread':>14} {'Excess spread':>14}")
     print(f"  {'-'*60}")

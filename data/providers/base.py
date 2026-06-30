@@ -1,5 +1,8 @@
+"""Abstract base class for OHLCV data providers."""
+
 from abc import ABC, abstractmethod
 from datetime import date
+
 import pandas as pd
 
 

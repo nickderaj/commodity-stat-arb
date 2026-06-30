@@ -1,3 +1,17 @@
+"""SQLAlchemy ORM models for the commodity stat-arb database.
+
+Tables
+------
+contracts        - Contract metadata (ticker, product, exchange, expiry dates)
+ohlcv_bars       - Daily OHLCV per contract
+contract_metrics - Daily microstructure proxy metrics per contract
+spreads          - Computed spread series with regime flags
+roll_calendar    - Historical roll/expiry dates per product
+signals          - Pre-computed signal values and entry/exit flags
+orders           - Full trade audit log (one row per completed trade)
+backtest_runs    - Run metadata and summary statistics per parameter set
+"""
+
 from datetime import date, datetime
 from sqlalchemy import (
     BigInteger,
@@ -20,6 +34,8 @@ class Base(DeclarativeBase):
 
 
 class Contract(Base):
+    """Exchange contract metadata. One row per individual contract month (e.g. CLF24)."""
+
     __tablename__ = "contracts"
 
     id = Column(Integer, primary_key=True)
@@ -38,6 +54,8 @@ class Contract(Base):
 
 
 class OHLCVBar(Base):
+    """Daily OHLCV bar for one contract. Volumes in contracts; prices in native quote units."""
+
     __tablename__ = "ohlcv_bars"
 
     id = Column(BigInteger, primary_key=True)
@@ -76,6 +94,8 @@ class ContractMetrics(Base):
 
 
 class Spread(Base):
+    """Computed spread series row. One row per (spread_name, date)."""
+
     __tablename__ = "spreads"
 
     id = Column(BigInteger, primary_key=True)
@@ -93,6 +113,8 @@ class Spread(Base):
 
 
 class RollCalendarEntry(Base):
+    """Roll calendar row: expiry and first-notice dates for one product + contract month."""
+
     __tablename__ = "roll_calendar"
 
     id = Column(Integer, primary_key=True)
@@ -108,6 +130,8 @@ class RollCalendarEntry(Base):
 
 
 class Signal(Base):
+    """Pre-computed z-score signal and entry/exit flags for one (spread, date, lookback)."""
+
     __tablename__ = "signals"
 
     id = Column(BigInteger, primary_key=True)
@@ -125,6 +149,8 @@ class Signal(Base):
 
 
 class Order(Base):
+    """Trade audit record. One row per completed round-trip trade."""
+
     __tablename__ = "orders"
 
     id = Column(BigInteger, primary_key=True)
@@ -150,6 +176,8 @@ class Order(Base):
 
 
 class BacktestRun(Base):
+    """Backtest run metadata and summary statistics. Keyed by params_hash for idempotency."""
+
     __tablename__ = "backtest_runs"
 
     id = Column(Integer, primary_key=True)

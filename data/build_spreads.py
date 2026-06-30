@@ -18,6 +18,7 @@ _DEFAULT_END = date.today()
 
 
 def main() -> None:
+    """Build and persist all configured spread series from raw contract bars."""
     parser = argparse.ArgumentParser(description="Build continuous spread series from ingested data")
     parser.add_argument("--start", default=str(_DEFAULT_START))
     parser.add_argument("--end", default=str(_DEFAULT_END))

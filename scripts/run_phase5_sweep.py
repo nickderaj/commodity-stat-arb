@@ -57,6 +57,7 @@ INITIAL_CAPITAL = 100_000.0
 # ---------------------------------------------------------------------------
 
 def run_sweep(write_to_db: bool = True) -> pd.DataFrame:
+    """Run all (spread x signal config x sizing) combinations and return results DataFrame."""
     results = []
     combos = list(product(SPREADS, SIGNAL_CONFIGS, SIZING_MODELS))
     total = len(combos)
@@ -125,6 +126,7 @@ def _print_row(r: dict) -> None:
 
 
 def print_summary(df: pd.DataFrame) -> None:
+    """Print ranked summary table and best-per-spread stats from sweep results."""
     print("\n" + "=" * 80)
     print("PHASE 5 SWEEP RESULTS - ranked by Sharpe ratio")
     print("=" * 80)
@@ -180,7 +182,7 @@ def print_summary(df: pd.DataFrame) -> None:
 
 
 def run_cost_impact_comparison(write_to_db: bool = True) -> None:
-    """Run zero-cost vs. cost-model side-by-side for the best signal config per spread."""
+    """Run zero-cost vs. cost-model side-by-side on the best signal config for each spread."""
     print("\n" + "=" * 80)
     print("COST IMPACT COMPARISON - zero-cost vs. with-costs (entry=2.0, exit=0.75, lb=60)")
     print("=" * 80)

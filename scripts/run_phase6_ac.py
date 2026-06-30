@@ -105,7 +105,7 @@ def _build_ac_model(engine: BacktestEngine) -> AlmgrenChrissModel:
 # ---------------------------------------------------------------------------
 
 def run_naive_vs_ac(write_to_db: bool = True) -> pd.DataFrame:
-    """Run naïve vs. AC comparison across all spreads. Returns summary DataFrame."""
+    """Run naïve fills vs. AC-simulated fills for each spread. Returns summary DataFrame."""
     rows = []
 
     print("\n" + "=" * 70)
@@ -209,7 +209,7 @@ def run_naive_vs_ac(write_to_db: bool = True) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def run_eta_sensitivity(write_to_db: bool = True) -> None:
-    """Show how Sharpe and PnL change as η scales up/down (brent_wti, best config)."""
+    """Print per-trade AC cost table and full-backtest Sharpe sensitivity across eta multipliers."""
     spread = "brent_wti"
     print("=" * 70)
     print(f"η SENSITIVITY ANALYSIS - {spread}, entry=2.0, lb=60")
@@ -286,6 +286,7 @@ def run_eta_sensitivity(write_to_db: bool = True) -> None:
 # ---------------------------------------------------------------------------
 
 def print_tod_curve() -> None:
+    """Print ASCII bar chart of the assumed U-shaped time-of-day liquidity multiplier."""
     print("=" * 70)
     print("TIME-OF-DAY LIQUIDITY MULTIPLIER (assumed U-shape - not estimated from data)")
     print("=" * 70)
@@ -307,6 +308,7 @@ def print_tod_curve() -> None:
 # ---------------------------------------------------------------------------
 
 def print_summary(df: pd.DataFrame) -> None:
+    """Print execution tax summary and per-component cost breakdown from naive vs. AC comparison."""
     if df.empty:
         print("No results to summarise.")
         return

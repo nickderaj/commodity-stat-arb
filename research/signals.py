@@ -156,51 +156,22 @@ def run_backtest(
     """Bar-by-bar backtest on a z-score signal.
 
     Position rules:
-      - Flat → Short spread when z > +entry (expect reversion down)
-      - Flat → Long spread when z < -entry  (expect reversion up)
+      - Flat to short spread when z > +entry (expect reversion down)
+      - Flat to long spread when z < -entry (expect reversion up)
       - Exit when |z| < exit_thresh
       - suppress (boolean Series): blocks NEW entries on that bar
 
-    PnL at bar t = position[t-1] x (spread[t] - spread[t-1])
-    No costs (Phase 5 concern).
+    PnL at bar t = position[t-1] x (spread[t] - spread[t-1]).
+    No costs applied (Phase 5 concern).
     """
-    n = len(zscore)
-    position = np.zeros(n)
-    in_pos = 0
-
-    sup_arr = suppress.values if suppress is not None else None
-    z_arr = zscore.values
-    sp_arr = spread.values
-
-    for i in range(1, n):
-        z = z_arr[i]
-        if np.isnan(z):
-            position[i] = in_pos
-            continue
-
-        if in_pos == 0:
-            blocked = sup_arr is not None and sup_arr[i]
-            if not blocked:
-                if z > entry:
-                    in_pos = -1
-                elif z < -entry:
-                    in_pos = 1
-        else:
-            if abs(z) < exit_thresh:
-                in_pos = 0
-
-        position[i] = in_pos
-
-    pos_s = pd.Series(position, index=spread.index)
+    pos_s = _compute_position_series(zscore, spread, entry, exit_thresh, suppress)
     daily_change = spread.diff()
-    # pnl[t] = position held at end of t-1 x change from t-1 to t
     pnl = pos_s.shift(1) * daily_change
 
     pnl_clean = pnl.dropna()
     if len(pnl_clean) < 20 or pnl_clean.std() < 1e-10:
         return {"sharpe": np.nan, "n_trades": 0, "total_pnl": np.nan, "win_rate": np.nan}
 
-    # Count trade entries
     pos_changes = pos_s.diff().abs()
     n_entries = int((pos_changes > 0.5).sum()) // 2 + 1
 

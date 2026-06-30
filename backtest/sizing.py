@@ -75,39 +75,12 @@ class FixedFractionalSizing(SizingModel):
         }
 
 
-class ATRSizing(SizingModel):
+class ATRSizing(FixedFractionalSizing):
     """Volatility-adjusted sizing: position size scales inversely with ATR.
 
-    Identical formula to FixedFractionalSizing but named distinctly so sweep
-    configs can select it explicitly and the distinction shows in the params_json.
-
-    Parameters
-    ----------
-    risk_pct : float
-        Fraction of equity to risk per trade (e.g., 0.01 = 1%).
-    max_leverage : float
-        Hard notional leverage cap.
-    min_atr : float
-        Floor for ATR.
+    Shares the same formula as FixedFractionalSizing but registers under a distinct
+    name so sweep configs can select it explicitly and the distinction appears in params_json.
     """
-
-    def __init__(
-        self,
-        risk_pct: float = 0.01,
-        max_leverage: float = 5.0,
-        min_atr: float = 0.10,
-    ) -> None:
-        self.risk_pct = risk_pct
-        self.max_leverage = max_leverage
-        self.min_atr = min_atr
-
-    def compute_size(self, equity: float, spread_price: float, atr: float) -> int:
-        atr_safe = max(float(atr), self.min_atr)
-        raw = equity * self.risk_pct / atr_safe
-
-        lev_cap = (self.max_leverage * equity / abs(spread_price)) if abs(spread_price) > 1e-8 else raw
-        qty = int(min(raw, lev_cap))
-        return max(1, qty)
 
     def name(self) -> str:
         return "atr_sizing"

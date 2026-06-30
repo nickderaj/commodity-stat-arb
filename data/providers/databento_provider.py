@@ -1,7 +1,19 @@
+"""Databento OHLCV provider for individual contract-month futures data.
+
+Fetches daily OHLCV bars from the Databento Historical API using the .FUT parent
+symbol so that all contract months are returned in one request. Calendar spread
+instruments are filtered out by a price-floor heuristic: outright crude contracts
+trade well above $5/bbl; calendar spread products (which quote the M1-M2 differential)
+are typically $0-5 and are excluded.
+
+Requires DATABENTO_API_KEY in environment or .env file.
+"""
+
 import os
 import re
 import warnings
 from datetime import date, timedelta
+
 import pandas as pd
 from dotenv import load_dotenv
 
